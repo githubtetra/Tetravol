@@ -29,14 +29,14 @@
 						<div class="col-lg-12 col-md-12 col-12 mb-9">
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="mb-2 mb-lg-0">
-									<h2 class="mb-0 fw-bold text-gray-300">Pito</h2>
+									<h2 class="mb-0 fw-bold text-gray-300">Gestion de cuentas</h2>
 								</div>
 							</div>
 						</div>
                         <div>
                             <div class="card mb-6 bg-dark">
 								<div class="card-body">
-									<a href="#" id='crearCuentaStaff' class="btn btn-dark-success text-white mx-1">Agregar Vehículo</a> 
+									<a href="#" id='crearCuentaStaff' class="btn btn-dark-success text-white mx-1">Crear cuenta</a> 
 								</div>
 							</div>
                             <div class="card bg-dark">
@@ -45,11 +45,10 @@
                                         <table class="table table table-dark table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">Nombre</th>
-                                                    <th scope="col">Modelo</th>
-                                                    <th scope="col">Precio</th>
-                                                    <th scope="col">Categoria</th>
-                                                    <th scope="col">Visible</th>
+                                                    <th scope="col">Username</th>
+                                                    <th scope="col">Password</th>
+                                                    <th scope="col">Rol</th>
+                                                    <th scope="col">Acción</th>
                                                 </tr>
                                             </thead>
                                             <!-- <tbody>
