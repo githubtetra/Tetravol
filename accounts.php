@@ -2,19 +2,9 @@
     require_once "libs/dbauth.php"; 
     include_once "utils/config.php";
 
-    $tipo_concesionario = $_GET["tipo"];
-
-    if ($tipo_concesionario == "normal") {
-        $title_label = "Concesionario Normal";
-        $sql_consulta = "SELECT * FROM vehiculos_shop WHERE vip = 0";
-    } elseif ($tipo_concesionario == "vip") { 
-        $title_label = "Concesionario VIP";
-        $sql_consulta = "SELECT * FROM vehiculos_shop WHERE vip = 1";
-    }
-
     session_start();
-	if (!isset($_SESSION['email'])) {
-		header("Location: login.php?redirect=concesionarios.php?tipo=".$tipo_concesionario);
+	if (!isset($_SESSION['username'])) {
+		header("Location: login.php");
 		session_destroy();
 	}
 ?>
@@ -39,14 +29,14 @@
 						<div class="col-lg-12 col-md-12 col-12 mb-9">
 							<div class="d-flex justify-content-between align-items-center">
 								<div class="mb-2 mb-lg-0">
-									<h2 class="mb-0 fw-bold text-gray-300"><?php echo $title_label; ?></h2>
+									<h2 class="mb-0 fw-bold text-gray-300">Pito</h2>
 								</div>
 							</div>
 						</div>
                         <div>
                             <div class="card mb-6 bg-dark">
 								<div class="card-body">
-									<a href="#" data-tipo="<?php echo $tipo_concesionario; ?>" class="btn btn-dark-success text-white mx-1 agregarVehiculo">Agregar Vehículo</a> 
+									<a href="#" id='crearCuentaStaff' class="btn btn-dark-success text-white mx-1">Agregar Vehículo</a> 
 								</div>
 							</div>
                             <div class="card bg-dark">
@@ -62,21 +52,21 @@
                                                     <th scope="col">Visible</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <!-- <tbody>
                                                 <?php 
-                                                    $vehiculos = MySql_Select($sql_consulta);  
+                                                    // $vehiculos = MySql_Select($sql_consulta);  
 
-                                                    while ($row = mysqli_fetch_array($vehiculos)) { 
-                                                        echo '<tr>'; 
-                                                        echo '<td>'.$row["nombre"].'</td>'; 
-                                                        echo '<td>'.$row["modelo"].'</td>';  
-                                                        echo '<td><span class="badge bg-dark-success">'.number_format($row["precio"]).'$</span></td>'; 
-                                                        echo '<td>'.$row["categoria"].'</td>'; 
-                                                        echo '<td>'.$row["visible"].'</td>'; 
-                                                        echo '</tr>';  
-                                                    } 
+                                                    // while ($row = mysqli_fetch_array($vehiculos)) { 
+                                                    //     echo '<tr>'; 
+                                                    //     echo '<td>'.$row["nombre"].'</td>'; 
+                                                    //     echo '<td>'.$row["modelo"].'</td>';  
+                                                    //     echo '<td><span class="badge bg-dark-success">'.number_format($row["precio"]).'$</span></td>'; 
+                                                    //     echo '<td>'.$row["categoria"].'</td>'; 
+                                                    //     echo '<td>'.$row["visible"].'</td>'; 
+                                                    //     echo '</tr>';  
+                                                    // } 
                                                 ?>
-                                            </tbody>
+                                            </tbody> -->
                                         </table>
                                     </div>
                                 </div>
@@ -87,5 +77,6 @@
             </div>
 		</div>
 		<?php include_once("utils/scripts.php") ?>
+        <script src="assets/js/staff.js"></script>
   	</body>
 </html>

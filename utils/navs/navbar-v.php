@@ -44,7 +44,7 @@
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link has-arrow" href="staffs.php">
+                        <a class="nav-link has-arrow" href="accounts.php">
                             <i data-feather="settings" class="nav-icon icon-xs me-2"></i>Gestión de las cuentas
                         </a>
                     </li>

@@ -35,27 +35,7 @@
                 }
                 
                 require_once "../utils/email/email.php";
-
-                // $mail = new PHPMailer(TRUE);
                 try {
-                    // $mail->setFrom('info@imperiorp.es', $staff.' desde ImperioRP');
-                    // $mail->addAddress($usuarioNuevo_email, $usuarioNuevo_nombre);
-                    // $mail->Subject = 'Bienvenido a la STAFF de ImperioRP.';
-                    // $mail->Body = $EMAIL_HTML;
-                    
-                    // $mail->IsHTML(true);  
-                    // $mail->CharSet = "UTF-8";
-
-                    // $mail->isSMTP();                    
-                    // $mail->Host = 'ssl0.ovh.net';
-                    // $mail->SMTPAuth = true;
-                    // $mail->SMTPSecure = 'ssl';
-                    // $mail->Username = 'admin@imperiorp.es';
-                    // $mail->Password = $CONFIG_PASSWD_SMTP;
-                    // $mail->Port = 465;
-
-                    // $mail->send();
-
                     $sql = MySql_Execute("INSERT INTO panel_users (`username`, `psswd`, `rol`) VALUES ('".$usuarioNuevo_nombre."', '".$usuarioNuevo_psswd."', '".$usuarioNuevo_rol."');");
                     
                     if ($sql) { $response = array("ok" => false, "error" => "Error en la consulta SQL, ".$sql.", contacta con el equipo de programación.", "data_post" => json_encode($_POST)); } 
