@@ -4,8 +4,8 @@
         <li class="dropdown ms-2">
             <a class="rounded-circle" href="#" role="button" id="dropdownUser" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="avatar avatar-md avatar-indicators avatar-online">
-                    <img alt="avatar" src="https://avatars.githubusercontent.com/u/118271519?v=4" class="rounded-circle" />
-                    <!-- <img alt="avatar" src="https://i.imgur.com/BmK6vCP.png" class="rounded-circle" /> -->
+                    <!-- <img alt="avatar" src="https://avatars.githubusercontent.com/u/118271519?v=4" class="rounded-circle" /> -->
+                    <img alt="avatar" src="https://i.imgur.com/BmK6vCP.png" class="rounded-circle" />
                 </div>
             </a>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">

@@ -16,7 +16,6 @@
 
 <!-- Theme JS -->
 <script src="assets/js/theme.min.js"></script>
-<script src="assets/js/main.js"></script>
 
 <!-- DataTables -->
 <script src="assets/libs/sort-table/sort-table.js"></script>

@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>ImperioRP | Admin</title>
+		<title>CCITUB | Admin</title>
 		<?php include_once("utils/head.php") ?>
 	</head>
 
@@ -51,21 +51,20 @@
                                                     <th scope="col">Acción</th>
                                                 </tr>
                                             </thead>
-                                            <!-- <tbody>
+                                            <tbody>
                                                 <?php 
-                                                    // $vehiculos = MySql_Select($sql_consulta);  
+                                                    $accounts = MySql_Select("SELECT * FROM `panel_users`");  
 
-                                                    // while ($row = mysqli_fetch_array($vehiculos)) { 
-                                                    //     echo '<tr>'; 
-                                                    //     echo '<td>'.$row["nombre"].'</td>'; 
-                                                    //     echo '<td>'.$row["modelo"].'</td>';  
-                                                    //     echo '<td><span class="badge bg-dark-success">'.number_format($row["precio"]).'$</span></td>'; 
-                                                    //     echo '<td>'.$row["categoria"].'</td>'; 
-                                                    //     echo '<td>'.$row["visible"].'</td>'; 
-                                                    //     echo '</tr>';  
-                                                    // } 
+                                                    while ($row = mysqli_fetch_array($accounts)) { 
+                                                        echo '<tr>'; 
+                                                        echo '<td>'.$row["username"].'</td>'; 
+                                                        echo '<td>'.$row["psswd"].'</td>';  
+                                                        echo '<td>'.$row["rol"].'</td>';
+                                                        echo '<td><a href="account.php?id='.$row["id"].'" class="btn btn-dark-success text-white mx-1">Editar</a></td>';
+                                                        echo '</tr>';  
+                                                    } 
                                                 ?>
-                                            </tbody> -->
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>

@@ -15,9 +15,7 @@ $(function () {
                 console.log(value.nombre)
                 if (!value.nombre) return Swal.showValidationMessage(`Tienes que indicar el nombre del usuario.`);
 
-                return ajaxRequest("main.php", { accion: "crear-cuenta", nombre_user: value.nombre }).then(e => {
-
-                }).catch(e => { Swal.showValidationMessage(e) });
+                return ajaxRequest("main.php", { accion: "crear-cuenta", nombre_user: value.nombre }).then(e => { console.log(e); }).catch(e => { Swal.showValidationMessage(e) });
             }
         }).then(async (result) => {
             console.log(result)
@@ -29,7 +27,6 @@ $(function () {
     });
 
     $("#eliminarCuenta").click(function() {
-        if (!window.superadmin) return Toast.fire({icon: 'error', title: `No tienes los suficientes permisos para realizar esta acción.`});
         var idStaff = $(this).data("idstaff")
 
         Swal.fire({

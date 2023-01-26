@@ -4,6 +4,11 @@
     $database = "test";
     $username = "root";
     $password = "";
+
+    // $servername = "db5011398959.hosting-data.io";
+    // $database = "dbs9617458";
+    // $username = "dbu465204";
+    // $password = "asdfghjklkuytrdfg";
     
     // Connect
     $conn = mysqli_connect($servername, $username, $password, $database);

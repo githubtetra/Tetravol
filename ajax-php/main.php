@@ -1,13 +1,6 @@
-<?php
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\Exception;
-
-    require 'C:\xampp\htdocs\admin\libs\PHPMailer\src\Exception.php';
-    require 'C:\xampp\htdocs\admin\libs\PHPMailer\src\PHPMailer.php';
-    require 'C:\xampp\htdocs\admin\libs\PHPMailer\src\SMTP.php';
-    
+<?php    
     require_once "../libs/dbauth.php"; 
-    require_once "../utils/config.php";  
+    require_once "../utils/config.php"; 
 
     session_start();
 	if (!isset($_SESSION['username'])) {
@@ -34,19 +27,11 @@
                     $usuarioNuevo_psswd = randomPassword();
                 }
                 
-                require_once "../utils/email/email.php";
-                try {
-                    $sql = MySql_Execute("INSERT INTO panel_users (`username`, `psswd`, `rol`) VALUES ('".$usuarioNuevo_nombre."', '".$usuarioNuevo_psswd."', '".$usuarioNuevo_rol."');");
-                    
-                    if ($sql) { $response = array("ok" => false, "error" => "Error en la consulta SQL, ".$sql.", contacta con el equipo de programación.", "data_post" => json_encode($_POST)); } 
-                    else { $response = array("ok" => true, "error" => "N/A", "data_post" => json_encode($_POST)); }
-                } catch (Exception $e) {
-                    $response = array("ok" => false, "error" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}", "data_post" => json_encode($_POST));
-                    $err = true;
-                } catch (\Exception $e) {
-                    $response = array("ok" => false, "error" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}", "data_post" => json_encode($_POST));
-                    $err = true;
-                }
+                $sql = MySql_Execute("INSERT INTO panel_users (`username`, `psswd`, `rol`) VALUES ('".$usuarioNuevo_nombre."', '".$usuarioNuevo_psswd."', '".$usuarioNuevo_rol."');");
+                
+                if ($sql) { $response = array("ok" => false, "error" => "Error en la consulta SQL, ".$sql.", contacta con el equipo de programación.", "data_post" => json_encode($_POST)); } 
+                else { $response = array("ok" => true, "error" => "N/A", "data_post" => json_encode($_POST)); }
+        
             } else if ($accion == "unock-level2") {
                 $Level = $_POST["nivel"];
                 $sql = MySql_Execute("UPDATE levels SET level_2 = 1 WHERE id = '".$_SESSION['id']."'");
@@ -57,6 +42,19 @@
                 $sql = MySql_Execute("UPDATE levels SET level_3 = 1 WHERE id = '".$_SESSION['id']."'");
                 if ($sql) { $response = array("ok" => false, "error" => "Error en la consulta SQL, ".$sql.", contacta con el equipo de programación.", "data_post" => json_encode($_POST)); } 
                 else { $response = array("ok" => true, "error" => "N/A", "data_post" => json_encode($_POST)); }
+            } else if ($accion == "eliminar-cuenta-staff") { 
+                if (!isset($_POST["idstaff"])) {
+                    $response = array("ok" => false, "error" => "No se han recibido los parametros correctos, contacta con Micky#7112", "data_post" => json_encode($_POST));
+                    $err = true;
+                } else { $idStaff = $_POST["idstaff"]; }
+                
+                $sql = MySql_Execute('DELETE FROM mck_panel_users WHERE id = "'.$idStaff.'"');
+                
+                if ($sql) { 
+                    $response = array("ok" => false, "error" => "Error en la consulta SQL, ".$sql.", contacta con Micky#7112.", "data_post" => json_encode($_POST));
+                } else {
+                    $response = array("ok" => true, "error" => "N/A", "data_post" => json_encode($_POST)); 
+                }
             }
         }
 
