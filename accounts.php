@@ -1,7 +1,7 @@
 <?php 
     require_once "libs/dbauth.php"; 
     include_once "utils/config.php";
-
+// 
     session_start();
 	if (!isset($_SESSION['username'])) {
 		header("Location: login.php");
