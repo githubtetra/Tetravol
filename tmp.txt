@@ -1,0 +1,26 @@
+editing ? <div className="EditUser">
+    <div className="EditUserContainer">
+        <h1>Edit User</h1>
+        <input type="text" placeholder="Username" value={editCurrentUser.username} />
+        <input type="text" placeholder="Password" value={editCurrentUser.password} />
+        <form action="roleEdit">
+            <select name="role" id="role">
+                <option value="1">Admin</option>
+                <option value="2">Teacher</option>
+                <option value="3">Student</option>
+            </select>
+        </form>
+        <button type="submit" onClick={() => { }}>Save</button>
+        <button onClick={() => { setEditing(false) }}>Cancel</button>
+    </div>
+</div> : null
+
+
+{
+    // addingUser ? <div>
+    //     <input type="text" placeholder="Username" />
+    //     <input type="text" placeholder="Password" />
+    //     <input type="text" placeholder="Role" />
+    //     <button onClick={() => { addUser() }}>Add</button>
+    // </div> : <button onClick={() => { addUser() }}>Add User</button>
+}

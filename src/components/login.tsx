@@ -21,16 +21,16 @@ const Login: React.FC<Props> = ({ id, name, pass, role, handleLogin }) => {
         // Send the username and password to the server and get the id, user, and role
         e.preventDefault();
         const { data } = await axios.post(loginUrl, {
-            name: username,
-            pass: password
+            username: username,
+            password: password
         });
 
         // See if response is not 401
         if (data.status === "success") {
             // Add the id, user, and role to local storage
             localStorage.setItem('id', data.data.id);
-            localStorage.setItem('name', data.data.username);
-            localStorage.setItem('pass', password)
+            localStorage.setItem('username', data.data.username);
+            localStorage.setItem('password', password)
             localStorage.setItem('role', data.data.role);
 
             // Call the handleLogin function from App.tsx

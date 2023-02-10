@@ -4,7 +4,7 @@ import Admin from "./admin";
 
 interface User {
     id: number;
-    name: string;
+    username: string;
     role: string;
 }
 
@@ -12,14 +12,14 @@ const Dashboard = () => {
 
     const user: User = {
         id: parseInt(localStorage.getItem('id') || '0'),
-        name: localStorage.getItem('name') || '',
+        username: localStorage.getItem('username') || '',
         role: localStorage.getItem('role') || '' // 1: admin, 2: teacher, 3: student
     }
 
     const logout:Function = ():void => {
         localStorage.removeItem('id');
-        localStorage.removeItem('name');
-        localStorage.removeItem('pass');
+        localStorage.removeItem('username');
+        localStorage.removeItem('password');
         localStorage.removeItem('role');
 
         window.location.reload();

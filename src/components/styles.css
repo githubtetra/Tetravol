@@ -1,3 +1,4 @@
+/* Path: src\components\login.component.ts */
 .login {
     background-color: #fff;
     border: 1px solid #ccc;
@@ -6,4 +7,67 @@
     margin: 0 auto;
     padding: 20px;
     width: 300px;
+}
+
+
+/* Path: src\components\admin\styles.css */
+.AllUsers {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #ccc;
+    margin: 0 auto;
+    padding: 20px;
+    width: 300px;
+
+    list-style: none;
+}
+
+.User {
+    width: 100%;
+    height: 50px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 15px;
+
+    background-color: green;
+}
+
+.UserInformation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.UserActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* EditUser popup */
+.EditUser {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #ccc;
+    margin: 0 auto;
+    padding: 20px;
+    width: 300px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    z-index: 100;
 }
