@@ -24,3 +24,12 @@ editing ? <div className="EditUser">
     //     <button onClick={() => { addUser() }}>Add</button>
     // </div> : <button onClick={() => { addUser() }}>Add User</button>
 }
+
+<div className="GroupInformation">
+    <h2>{group.label}</h2>
+    <h3>{group.teacher_id}</h3>
+</div>
+<div className="GroupButtons">
+    <button>Edit</button>
+    <button>Delete</button>
+</div>

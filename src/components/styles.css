@@ -71,3 +71,15 @@
 
     z-index: 100;
 }
+
+table {
+    width: 100%;
+}
+
+thead {
+    background-color: #ccc;
+}
+
+td {
+    padding: 5px;
+}

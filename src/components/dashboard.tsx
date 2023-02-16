@@ -1,5 +1,5 @@
 import React from "react";
-import Teachers from "./teachers";
+import Tutores from "./tutores";
 import Admin from "./admin";
 
 interface User {
@@ -35,10 +35,10 @@ const Dashboard = () => {
                 user.role === '1' ? <>
                 <Admin />
                 </> : user.role === '2' ? <>
-                <Teachers />
-                </> : <>
-                <h2>Student</h2>
-                </>
+                <Tutores />
+                </> : user.role == '3' ?<>
+                <h2>Profesor</h2>
+                </> : <h2>Estudiante</h2>
             }
         </div>
     );

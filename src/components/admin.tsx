@@ -13,7 +13,7 @@ interface User {
 
 interface Group {
 	id_group: number;
-	teacher_id: number;
+	tutor_id: number;
 	label: string;
 }
 
@@ -21,6 +21,7 @@ const Admin = () => {
 	const [users, setUsers] = React.useState<User[]>([]);
 	const [loading, setLoading] = React.useState<boolean>(false);
 	const [editing, setEditing] = React.useState<boolean>(false);
+	const [editingGroup, setEditingGroup] = React.useState<boolean>(false);
 
 	const [editCurrentUser, setEditCurrentUser] = React.useState<User>({
 		id: 0,
@@ -40,7 +41,13 @@ const Admin = () => {
 
 	const [newgroup, setNewGroup] = React.useState<Group>({
 		id_group: 0,
-		teacher_id: 0,
+		tutor_id: 0,
+		label: "",
+	});
+
+	const [editCurrentGroup, setEditCurrentGroup] = React.useState<Group>({
+		id_group: 0,
+		tutor_id: 0,
 		label: "",
 	});
 
@@ -108,6 +115,18 @@ const Admin = () => {
 		});
 	};
 
+	const editGroup: Function = async (name: string, id: number): Promise<void> => {
+		setLoading(true);
+		const link = "http://192.100.20.167:3000/api/group/update/" + id;
+
+		const res = await axios.post(link, {
+			label: name
+		});
+		setLoading(false);
+		setEditing(false);
+		getGroups();
+	}
+
 	const addGroup = async (group: Group): Promise<void> => {
 		setLoading(true);
 		const link = "http://192.100.20.167:3000/api/group/create"
@@ -153,8 +172,9 @@ const Admin = () => {
 					}}
 				>
 					<option value="1">Admin</option>
-					<option value="2">Teacher</option>
-					<option value="3">Student</option>
+					<option value="2">Tutor</option>
+					<option value="3">Profesor</option>
+					<option value="4">Estudiante</option>
 				</select>
 				<select value={newuser.group} onChange={(e) => {
 					setNewUser({ ...newuser, group: e.target.value });
@@ -186,24 +206,31 @@ const Admin = () => {
 			</div>
 
 			<h2>All Groups</h2>
-			<ul className="AllGroups">
-				{groups.map((group: Group) => {
-					return (
-						<li key={group.id_group}>
-							<div className="Group">
-								<div className="GroupInformation">
-									<h2>{group.label}</h2>
-									<h3>{group.teacher_id}</h3>
-								</div>
-								<div className="GroupButtons">
-									<button>Edit</button>
-									<button>Delete</button>
-								</div>
-							</div>
-						</li>
-					);
-				})}
-			</ul>
+			<table>
+				<thead>
+					<tr>
+						<th>Group</th>
+						<th>Tutor</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{groups.map((group: Group) => {
+						return (
+							<tr>
+								<td>{group.label}</td>
+								<td>{group.tutor_id}</td>
+								<td>
+									<button onClick={() => {
+										editGroup(group.label, group.id_group);
+									}}>Edit</button>
+								</td>
+							</tr>
+						)
+					})}
+				</tbody>
+			</table>
+
 
 			{/* Admin can see all users, edit and delete */}
 			<h2>All Users</h2>
@@ -214,128 +241,46 @@ const Admin = () => {
 			>
 				Update
 			</button>
-			{loading ? (
-				<h2>Loading...</h2>
-			) : (
-				<>
-					<ul className="AllUsers">
-						{users.map((user: User) => {
-							return (
-								<li key={user.id}>
-									<div className="User">
-										<div className="UserInformation">
-											<h2>{user.username}</h2>
-											<h3>
-												{
-													<>
-														{" "}
-														{user.role === 1
-															? "Admin"
-															: user.role === 2
-																? "Teacher"
-																: "Student"}
-													</>
-												}
-											</h3>
-											<div className="UserGroup"> {user.group} </div>
-										</div>
-										<div className="UserActions">
-											{editing ? (
-												<>
-													<button disabled>Edit</button>
-													<button disabled>Delete</button>
-												</>
-											) : (
-												<>
-													<button
-														onClick={() => {
-															setEditCurrentUser(user);
-															setEditing(true);
-														}}
-													>
-														Edit
-													</button>
-													<button onClick={() => { }}>Delete</button>
-												</>
-											)}
-										</div>
-									</div>
-								</li>
-							);
-						})}
-					</ul>
-				</>
-			)}
 
-			{/* Edit user popup */}
-			{
-				// Use on change to update the editCurrentUser object
-				editing ? (
-					<div className="EditUser">
-						<div className="EditUserContainer">
-							<h2>Edit User</h2>
-							<input
-								type="text"
-								placeholder="Username"
-								value={editCurrentUser.username}
-								onChange={(e) => {
-									setEditCurrentUser({
-										...editCurrentUser,
-										username: e.target.value,
-									});
-								}}
-							/>
-							<input
-								type="text"
-								placeholder="Password"
-								value={editCurrentUser.password}
-								onChange={(e) => {
-									setEditCurrentUser({
-										...editCurrentUser,
-										password: e.target.value,
-									});
-								}}
-							/>
-							<input
-								type="text"
-								placeholder="Role"
-								value={editCurrentUser.role}
-								onChange={(e) => {
-									setEditCurrentUser({
-										...editCurrentUser,
-										role: parseInt(e.target.value),
-									});
-								}}
-							/>
-							<input
-								type="text"
-								placeholder="Group"
-								value={editCurrentUser.group}
-								onChange={(e) => {
-									setEditCurrentUser({
-										...editCurrentUser,
-										group: e.target.value,
-									});
-								}}
-							/>
-							<button
-								onClick={() => {
-									editUser(editCurrentUser);
-								}}
-							>
-								Save
-							</button>
-							<button
-								onClick={() => {
-									setEditing(false);
-								}}
-							>
-								Cancel
-							</button>
-						</div>
-					</div>
-				) : null
-			}
+			<table>
+				<thead>
+					<tr>
+						<th>Username</th>
+						<th>Password</th>
+						<th>Role</th>
+						<th>Group</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{users.map((user: User) => {
+						return (
+							<tr>
+								<td>{user.username}</td>
+								<td>{user.password}</td>
+								<td>{user.role}</td>
+								<td>{user.group}</td>
+								<td>
+									<button
+										onClick={() => {
+											// editUser(user);
+										}}
+									>
+										Edit
+									</button>
+									<button
+										onClick={() => {
+											// deleteUser(user.id_user);
+										}}
+									>
+										Delete
+									</button>
+								</td>
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
 		</div>
 	);
 };

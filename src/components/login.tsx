@@ -32,6 +32,7 @@ const Login: React.FC<Props> = ({ id, name, pass, role, handleLogin }) => {
             localStorage.setItem('username', data.data.username);
             localStorage.setItem('password', password)
             localStorage.setItem('role', data.data.role);
+            localStorage.setItem('group_id', data.data.group);
 
             // Call the handleLogin function from App.tsx
             handleLogin(e);
