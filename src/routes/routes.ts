@@ -20,7 +20,7 @@ router.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     let data;
 
-    await connection.query('SELECT id,username,role FROM user_accounts WHERE username = ? AND password = ?', [username, password], async (err, result) => {
+    await connection.query('SELECT id,username,role,`group` FROM user_accounts WHERE username = ? AND password = ?', [username, password], async (err, result) => {
         if (err)
             throw err;
         if (result.length > 0) {
@@ -28,13 +28,13 @@ router.post('/api/login', async (req, res) => {
 
             let Id = data.id;
 
-            await connection.query('SELECT * FROM user_levels WHERE id_user = ?', [Id], (err, result) => {
+            await connection.query('SELECT * FROM user_levels WHERE id = ?', [Id], (err, result) => {
                 if (err) throw err;
                 if (result.length > 0) {
                     console.log('Nivel de usuario ya creado');
 
                 } else {
-                    connection.query('INSERT INTO user_levels (id_user) VALUES (?)', [Id], (err, _result) => {
+                    connection.query('INSERT INTO user_levels (id) VALUES (?)', [Id], (err, _result) => {
                         if (err) throw err;
                         console.log('Nivel de usuario creado');
                     });
@@ -48,21 +48,21 @@ router.post('/api/login', async (req, res) => {
 });
 
 router.get('/api/users', (_req, res) => {
-    connection.query('SELECT id,username,role,password,label AS `group` FROM user_accounts INNER JOIN user_groups ON user_accounts.`group` = user_groups.id_group', (err, result) => {
+    connection.query('SELECT id,username,role,password,label AS `group` FROM user_accounts INNER JOIN user_groups ON user_accounts.`group` = user_groups.id_group ORDER BY `role`', (err, result) => {
         if (err) throw err;
         res.json({ status: 'success', message: 'Lista de usuarios', data: result });
     });
 });
 
 router.get('/api/users/teacher', (_req, res) => {
-    connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 2', (err, result) => {
+    connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 3', (err, result) => {
         if (err) throw err;
         res.json({ status: 'success', message: 'Lista de profesores', data: result });
     });
 });
 
 router.get('/api/users/student', (_req, res) => {
-    connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 3', (err, result) => {
+    connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 4', (err, result) => {
         if (err) throw err;
         res.json({ status: 'success', message: 'Lista de estudiantes', data: result });
     });
@@ -107,13 +107,22 @@ router.post('/api/users/group/:id', (req, res) => {
     const { id } = req.params;
     let data: any = [];
 
-    connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE `group` = ? AND role = 3', [id], (err, result) => {
+    connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE `group` = ? AND role = 4', [id], (err, result) => {
         if (err) throw err;
         data = result;
-        connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE `group` = ? AND role = 2', [id], (err, result1) => {
+        connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE `group` = ? AND role = 3', [id], (err, result1) => {
             if (err) throw err;
-            res.json({ status: 'success', message: 'Lista de usuarios en grupo', data: data, "Teacher": result1[0] });
+            res.json({ status: 'success', message: 'Lista de usuarios en grupo', data: data, "teacher": result1[0] });
         });
+    });
+});
+
+router.post('/api/get/group/:id', (req, res) => {
+    const { id } = req.params;
+
+    connection.query('SELECT label FROM user_groups WHERE id_group = ?', [id], (err, result) => {
+        if (err) throw err;
+        res.json({ status: 'success', message: 'Grupo encontrado', data: result[0] });
     });
 });
 
@@ -129,6 +138,8 @@ router.get('/api/user/:id', (req, res) => {
 router.post('/api/user/update/:id', (req, res) => {
     const { id } = req.params;
     const { username, password, role, group } = req.body;
+
+    if(req.body === undefined) res.status(400).json({ status: 'error', message: 'No se han enviado datos' });
 
     connection.query('UPDATE user_accounts SET username = ?, password = ?, role = ?, `group` = ? WHERE id = ?', [username, password, role, group, id], (err, _result) => {
         if (err) throw err;
