@@ -1,0 +1,29 @@
+::-webkit-scrollbar {
+    width: 5px;
+    background-color: black;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: white;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+
+@keyframes opacity {
+  0% {
+     background-color: rgb(62 61 61 / 70%);
+  }
+
+  50% {
+    background-color: #fff;
+    color: black;
+  }
+
+  100% {
+    background-color: rgb(62 61 61 / 70%);
+  }
+}
