@@ -48,32 +48,59 @@ router.post('/api/login', async (req, res) => {
 });
 
 router.get('/api/users', (_req, res) => {
-    connection.query('SELECT id,username,role,password,label AS `group` FROM user_accounts INNER JOIN user_groups ON user_accounts.`group` = user_groups.id_group ORDER BY `role`', (err, result) => {
+    connection.query('SELECT id,username,role,password,label AS `group`,id_group FROM user_accounts INNER JOIN user_groups ON user_accounts.`group` = user_groups.id_group ORDER BY `role`', (err, result) => {
         if (err) throw err;
         res.json({ status: 'success', message: 'Lista de usuarios', data: result });
     });
 });
 
-router.get('/api/users/teacher', (_req, res) => {
-    connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 3', (err, result) => {
-        if (err) throw err;
-        res.json({ status: 'success', message: 'Lista de profesores', data: result });
-    });
+router.get('/api/users/:type', (req, res) => {
+    const { type } = req.params;
+    
+    switch (type) {
+        case 'teacher':
+            connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 3', (err, result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Lista de profesores', data: result });
+            });
+            break;
+        case 'student':
+            connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 4', (err, result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Lista de estudiantes', data: result });
+            });
+            break;
+            case 'group':
+                connection.query('SELECT * FROM user_groups ORDER BY id_group', (err, result) => {
+                    if (err) throw err;
+                    res.json({ status: 'success', message: 'Lista de grupos', data: result });
+                });
+                break;
+        default:
+            break;
+    }
 });
 
-router.get('/api/users/student', (_req, res) => {
-    connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 4', (err, result) => {
-        if (err) throw err;
-        res.json({ status: 'success', message: 'Lista de estudiantes', data: result });
-    });
-});
+// router.get('/api/users/teacher', (_req, res) => {
+//     connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 3', (err, result) => {
+//         if (err) throw err;
+//         res.json({ status: 'success', message: 'Lista de profesores', data: result });
+//     });
+// });
 
-router.get('/api/users/group', (_req, res) => {
-    connection.query('SELECT * FROM user_groups', (err, result) => {
-        if (err) throw err;
-        res.json({ status: 'success', message: 'Lista de grupos', data: result });
-    });
-});
+// router.get('/api/users/student', (_req, res) => {
+//     connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 4', (err, result) => {
+//         if (err) throw err;
+//         res.json({ status: 'success', message: 'Lista de estudiantes', data: result });
+//     });
+// });
+
+// router.get('/api/users/group', (_req, res) => {
+//     connection.query('SELECT * FROM user_groups ORDER BY id_group', (err, result) => {
+//         if (err) throw err;
+//         res.json({ status: 'success', message: 'Lista de grupos', data: result });
+//     });
+// });
 
 router.post('/api/group/create', (req, res) => {
     const { label } = req.body;
@@ -117,6 +144,25 @@ router.post('/api/users/group/:id', (req, res) => {
     });
 });
 
+router.post('/api/get/group/id', (req, res) => {
+    const { label } = req.body;
+
+    console.log(label);
+
+    connection.query('SELECT id_group FROM user_groups WHERE label = ?', [label], (err, result) => {
+        if (err) throw err;
+        console.log(result[0]);
+        res.json(result[0]);
+    });
+});
+
+router.get('/api/get/teacher', (_req, res) => {
+    connection.query('SELECT id,username,role,`group` FROM user_accounts WHERE role = 3', (err, result) => {
+        if (err) throw err;
+        res.json({ status: 'success', message: 'Profesor encontrado', data: result });
+    });
+});
+
 router.post('/api/get/group/:id', (req, res) => {
     const { id } = req.params;
 
@@ -138,11 +184,19 @@ router.get('/api/user/:id', (req, res) => {
 router.post('/api/user/update/:id', (req, res) => {
     const { id } = req.params;
     const { username, password, role, group } = req.body;
-
-    if(req.body === undefined) res.status(400).json({ status: 'error', message: 'No se han enviado datos' });
+    let group_id: any;
 
     connection.query('UPDATE user_accounts SET username = ?, password = ?, role = ?, `group` = ? WHERE id = ?', [username, password, role, group, id], (err, _result) => {
-        if (err) throw err;
+        if (err) {
+            connection.query('SELECT id_group FROM user_groups WHERE label = ?', [group], (err, result) => {
+                if (err) throw err;
+                group_id = result[0];
+                connection.query('UPDATE user_accounts SET username = ?, password = ?, role = ?, `group` = ? WHERE id = ?', [username, password, role, group_id.id_group, id], (err, _result) => {
+                    if (err) throw err;
+                    return console.log('Usuario actualizado correctamente');
+                });
+            });
+        }
         res.json({ status: 'success', message: 'Usuario actualizado correctamente' });
     });
 });
