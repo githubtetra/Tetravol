@@ -1,25 +1,26 @@
 import React, { useEffect } from "react";
 import axios from 'axios';
 
-import databhooks from '../hooks/hooks';
+import api from '../hooks/hooks';
 
 interface Student {
-	id: number;
-	username: string;
-	password: string;
-	role: number;
-	group: string;
-    editing: boolean;
+    id: number;
+    username: string;
+    password: string;
+    role: number;
+    group: string;
 }
 
 interface Group {
-	id_group: number;
-	teacher_id: number;
-	label: string;
+    id_group: number;
+    teacher_id: number;
+    label: string;
 }
 
-const Teachers = () => {
+const Tutores = () => {
     const [students, setStudents] = React.useState<Student[]>([]);
+    const [groups, setGroups] = React.useState<Group[]>([]);
+    const [editing, setEditing] = React.useState<boolean>(false);
 
     const [group, setGroup] = React.useState<Group>({
         id_group: 0,
@@ -33,38 +34,48 @@ const Teachers = () => {
         password: "",
         role: 0,
         group: "",
-        editing: false,
     });
 
 
     const getGroup: Function = async (): Promise<void> => {
-        const data = await databhooks.getGroupById(localStorage.getItem('group_id'));
+        const data = await api.getGroupById(localStorage.getItem('group_id'));
         setGroup(data);
+
+        const allgroups = await api.getAllGroups();
+        setGroups(allgroups);
     }
 
-
-
-
     const getStudents: Function = async (): Promise<void> => {
-        const data = await databhooks.getStudentByIdGroup(localStorage.getItem('group_id'));
+        const data = await api.getStudentByIdGroup(localStorage.getItem('group_id'));
         setStudents(data);
     }
 
     const editStudent: Function = async (id: number): Promise<void> => {
-        // Remove editing from all students
-        setStudents(students.map((student) => {
-            student.editing = false;
-            return student;
-        }));
-        
-        setStudents(students.map((student) => {
-            if (student.id === id) {
-                student.editing = true;
-            }
-            return student;
-        }));
+        setEditing(true);
+        const data = students.find((student) => student.id === id);
+        if (data) setNewUser(data);
+    }
 
-        // getStudents();
+    const updateStudent: Function = async (id: number): Promise<void> => {
+        setEditing(false);
+        await api.editUser(newuser);
+        resetnewuser();
+        getStudents();
+    }
+
+    const cancelEdit: Function = async (): Promise<void> => {
+        setEditing(false);
+        resetnewuser();
+    }
+
+    const resetnewuser: Function = async (): Promise<void> => {
+        setNewUser({
+            id: 0,
+            username: "",
+            password: "",
+            role: 0,
+            group: localStorage.getItem('group_id') === null ? "" : localStorage.getItem('group_id')!,
+        });
     }
 
     useEffect(() => {
@@ -75,9 +86,28 @@ const Teachers = () => {
     return (
         <div>
             <h1>Tutores</h1>
+            
+            {/* Add users */}
+            <div className="add-user">
+                <h2>Agregar usuario</h2>
+                <form>
+                    <label>Username</label>
+                    <input type="text" name="username" value={newuser.username} onChange={(e) => setNewUser({ ...newuser, username: e.target.value })} />
+                    <label>Password</label>
+                    <input type="text" name="password" value={newuser.password} onChange={(e) => setNewUser({ ...newuser, password: e.target.value })} />
+                    <label>Rol</label>
+                    <select name="role" value={newuser.role} onChange={(e) => setNewUser({ ...newuser, role: parseInt(e.target.value) })}>
+                        {/* <option value="1">Admin</option> */}
+                        <option value="3">Profesor</option>
+                        <option value="4">Estudiante</option>
+                    </select>
+                </form>
 
-            <button onClick={() => { getStudents() }}>Get Students</button>
+                <button onClick={() => { api.addUser(newuser); getStudents(); }}>Agregar</button>
+            </div>
+                    
 
+            <h2>{group.label}</h2>
             <table>
                 <thead>
                     <tr>
@@ -93,32 +123,48 @@ const Teachers = () => {
                     </tr>
                     {/* Show all student information and when click button edit change text to input fields */}
                     {students.map((student) => (
-                        student.editing ? (
-                            <tr key={student.id}>
-                                <td><input type="text" value={student.username} onChange={(e) => { setNewUser({ ...newuser, username: e.target.value }) }} /></td>
-                                <td><input type="text" value={student.password} onChange={(e) => { setNewUser({ ...newuser, password: e.target.value }) }} /></td>
-                                <td><input type="number" value={student.role} onChange={(e) => { setNewUser({ ...newuser, role: parseInt(e.target.value) }) }} /></td>
-                                <td><input type="text" value={student.group} onChange={(e) => { setNewUser({ ...newuser, group: e.target.value }) }} /></td>
-                                <td>
-                                    <button onClick={() => { editStudent(student.id) }}>Edit</button>
-                                </td>
-                            </tr>
-                        ) : (
-                            <tr key={student.id}>
-                                <td>{student.username}</td>
-                                <td>{student.password}</td>
-                                <td>{student.role}</td>
-                                <td>{student.group}</td>
-                                <td>
-                                    <button onClick={() => { editStudent(student.id) }}>Edit</button>
-                                </td>
-                            </tr>
-                        )
+                        <tr key={student.id}>
+                            <td>{student.username}</td>
+                            <td>{student.password}</td>
+                            <td>{api.from_id_to_role(student.role)}</td>
+                            <td>{student.group}</td>
+                            <td>
+                                <button onClick={() => { editStudent(student.id) }}>Edit</button>
+                                <button onClick={() => { }}>Delete</button>
+                            </td>
+                        </tr>
                     ))}
                 </tbody>
             </table>
+
+            {/* Edit student */}
+            {
+                editing === true ? (
+                    <div className="edit-user">
+                        <h2>Editar usuario</h2>
+                        <form>
+                            <label>Username</label>
+                            <input type="text" name="username" value={newuser.username} onChange={(e) => setNewUser({ ...newuser, username: e.target.value })} />
+                            <label>Password</label>
+                            <input type="text" name="password" value={newuser.password} onChange={(e) => setNewUser({ ...newuser, password: e.target.value })} />
+                            <label>Rol</label>
+                            <select name="role" value={newuser.role} onChange={(e) => setNewUser({ ...newuser, role: parseInt(e.target.value) })}>
+                                {/* <option value="1">Admin</option> */}
+                                <option value="3">Profesor</option>
+                                <option value="4">Estudiante</option>
+                            </select>
+                        </form>
+
+                        <button onClick={() => { updateStudent() }}>Guardar</button>
+                        <button onClick={() => { cancelEdit() }}>Cancelar</button>
+                    </div>
+                ) : (
+                    <div> </div>
+                )
+            }
+
         </div>
     );
 }
 
-export default Teachers;
+export default Tutores;
