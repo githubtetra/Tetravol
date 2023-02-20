@@ -1,6 +1,7 @@
 import React from "react";
 import Tutores from "./tutores";
 import Admin from "./admin";
+import Profesores from "./profesores";
 
 interface User {
     id: number;
@@ -37,7 +38,7 @@ const Dashboard = () => {
                 </> : user.role === '2' ? <>
                 <Tutores />
                 </> : user.role == '3' ?<>
-                <h2>Profesor</h2>
+                <Profesores/>
                 </> : <h2>Estudiante</h2>
             }
         </div>
