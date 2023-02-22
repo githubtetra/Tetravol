@@ -10,6 +10,8 @@ router.get('/api/status', (_req, res) => {
 router.post('/api/create/user', (req, res) => {
     const { username, password, role, group } = req.body;
 
+    console.log(username, password, role, group);
+
     connection.query('INSERT INTO user_accounts (username, password, role, `group`) VALUES (?, ?, ?, ?)', [username, password, role, group], (err, _result) => {
         if (err) throw err;
         res.json({ status: 'success', message: 'Usuário creado correctamente' });
@@ -32,7 +34,6 @@ router.post('/api/login', async (req, res) => {
                 if (err) throw err;
                 if (result.length > 0) {
                     console.log('Nivel de usuario ya creado');
-
                 } else {
                     connection.query('INSERT INTO user_levels (id) VALUES (?)', [Id], (err, _result) => {
                         if (err) throw err;
@@ -81,26 +82,14 @@ router.get('/api/users/:type', (req, res) => {
     }
 });
 
-// router.get('/api/users/teacher', (_req, res) => {
-//     connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 3', (err, result) => {
-//         if (err) throw err;
-//         res.json({ status: 'success', message: 'Lista de profesores', data: result });
-//     });
-// });
+router.get('/api/getall/group/:id', (req, res) => {
+    const { id } = req.params;
 
-// router.get('/api/users/student', (_req, res) => {
-//     connection.query('SELECT id,username,role,password,`group` FROM user_accounts WHERE role = 4', (err, result) => {
-//         if (err) throw err;
-//         res.json({ status: 'success', message: 'Lista de estudiantes', data: result });
-//     });
-// });
-
-// router.get('/api/users/group', (_req, res) => {
-//     connection.query('SELECT * FROM user_groups ORDER BY id_group', (err, result) => {
-//         if (err) throw err;
-//         res.json({ status: 'success', message: 'Lista de grupos', data: result });
-//     });
-// });
+    connection.query('SELECT * FROM user_accounts WHERE `group` = ?', [id], (err, result) => {
+        if (err) throw err;
+        res.json({ status: 'success', message: 'Grupo', data: result });
+    });
+});
 
 router.post('/api/group/create', (req, res) => {
     const { label } = req.body;
@@ -204,9 +193,11 @@ router.post('/api/user/update/:id', (req, res) => {
 router.post('/api/user/delete/:id', async (req, res) => {
     const { id } = req.params;
 
-    await connection.query('DELETE FROM user_levels WHERE id = ?', [id], (err, _result) => { if (err) throw err; });
+    console.log("ID: " + id + " eliminado");
 
-    await connection.query('DELETE FROM user_accounts WHERE id = ?', [id], (err, _result) => { if (err) throw err; });
+    await connection.query('DELETE FROM user_levels WHERE id = ?', [id], (err, _result) => { if (err) throw err; console.log('Niveles eliminados correctamente'); });
+
+    await connection.query('DELETE FROM user_accounts WHERE id = ?', [id], (err, _result) => { if (err) throw err; console.log('Usuario eliminado correctamente'); });
 
     res.json({ status: 'success', message: 'Usuario eliminado correctamente' });
 });
