@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const ip = "138.68.98.150"
-const url = "http://192.100.20.167:3000/api/";
+const local = "192.100.20.167"
+const url = "http://138.68.98.150:3000/api/";
 
 interface User {
 	id: number;
