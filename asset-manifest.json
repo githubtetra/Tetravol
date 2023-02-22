@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Tetraball/static/css/main.2a59c684.css",
+    "main.js": "/Tetraball/static/js/main.33095585.js",
+    "static/js/787.2e91f9a6.chunk.js": "/Tetraball/static/js/787.2e91f9a6.chunk.js",
+    "index.html": "/Tetraball/index.html",
+    "main.2a59c684.css.map": "/Tetraball/static/css/main.2a59c684.css.map",
+    "main.33095585.js.map": "/Tetraball/static/js/main.33095585.js.map",
+    "787.2e91f9a6.chunk.js.map": "/Tetraball/static/js/787.2e91f9a6.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2a59c684.css",
+    "static/js/main.33095585.js"
+  ]
+}
