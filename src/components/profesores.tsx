@@ -78,6 +78,18 @@ const Profesores = () => {
         });
     }
 
+    const deleteStudent: Function = async (id: number): Promise<void> => {
+        await api.deleteUser(id);
+        getStudents();
+    }
+
+    const addUser: Function = async (): Promise<void> => {
+        newuser.group = localStorage.getItem('group_id') === null ? "" : localStorage.getItem('group_id')!;
+        await api.addUser(newuser);
+        getStudents();
+    }
+    
+
     useEffect(() => {
         getStudents();
         getGroup();
@@ -85,25 +97,33 @@ const Profesores = () => {
 
     return (
         <div>
-            <h1>Tutores</h1>
+            <h1>Profesores</h1>
             
-            {/* Add users */}
-            <div className="add-user">
-                <h2>Agregar usuario</h2>
-                <form>
-                    <label>Username</label>
-                    <input type="text" name="username" value={newuser.username} onChange={(e) => setNewUser({ ...newuser, username: e.target.value })} />
-                    <label>Password</label>
-                    <input type="text" name="password" value={newuser.password} onChange={(e) => setNewUser({ ...newuser, password: e.target.value })} />
-                    <label>Rol</label>
-                    <select name="role" value={newuser.role} onChange={(e) => setNewUser({ ...newuser, role: parseInt(e.target.value) })}>
-                        {/* <option value="1">Admin</option> */}
-                        <option value="4">Estudiante</option>
-                    </select>
-                </form>
+			{/* Add users */}
+			<div className="add-user">
+				<h2>Afegir usuari</h2>
+				<form>
+					<div className="form-group">
+						<label>Nom d'usuari:</label>
+						<input type="text" name="username" value={newuser.username} onChange={(e) => setNewUser({ ...newuser, username: e.target.value })} />
+					</div>
 
-                <button onClick={() => { api.addUser(newuser); getStudents(); }}>Agregar</button>
-            </div>
+					<div className="form-group">
+						<label>Contrasenya:</label>
+						<input type="text" name="password" value={newuser.password} onChange={(e) => setNewUser({ ...newuser, password: e.target.value })} />
+					</div>
+
+					<div className="form-group">
+						<label>Rol:</label>
+						<select name="role" value={newuser.role} onChange={(e) => setNewUser({ ...newuser, role: parseInt(e.target.value) })}>
+							{/* <option value="1">Admin</option> */}
+							<option value="4">Estudiant</option>
+						</select>
+					</div>
+				</form>
+
+				<button onClick={() => { addUser(); }}>Afegir</button>
+			</div>
                     
 
             <h2>{group.label}</h2>
@@ -129,7 +149,7 @@ const Profesores = () => {
                             <td>{student.group}</td>
                             <td>
                                 <button onClick={() => { editStudent(student.id) }}>Edit</button>
-                                <button onClick={() => { }}>Delete</button>
+                                <button onClick={() => { deleteStudent(student.id) }}>Delete</button>
                             </td>
                         </tr>
                     ))}

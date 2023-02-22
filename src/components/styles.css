@@ -1,4 +1,9 @@
 /* Path: src\components\login.component.ts */
+body {
+    /* background-color: #F2F2F2; */
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 .login {
     background-color: #fff;
     border: 1px solid #ccc;
@@ -12,19 +17,69 @@
 /* General */
 table {
     width: 100%;
+    /* background-color: #2d5cb3; */
+    /* background-color: #ccc; */
+    background-color: #c6d7ef;
+
+    width: 95%;
+    margin: auto;
 }
 
 thead {
-    background-color: #ccc;
+    color: white;
+    background-color: #2d5cb3;
+    border-color: #2d5cb3;
+    border-radius: 10px;
 }
 
 td {
     padding: 5px;
+    border-radius: 4px;
+}
+
+.add-user {
+    /* background-color: #ccc; */
+    /* border: 1px solid #ccc; */
+
+    width: 95%;
+    height: 100%;
+    margin: auto;
+
+    border-radius: 5px;
+}
+
+.add-user h2 {
+    text-align: center;
+    background-color: #2d5cb3;
+    width: 60%;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+    margin: auto;
+    /* margin-top: 0.5em; */
+    color: white;
+}
+
+.add-user form {
+    margin: 0 auto;
+    width: 80%
+}
+
+.add-user form input {
+    margin: 5px 0;
+}
+
+.form-group {
+    margin: 5px 0;
+    /* background-color: red; */
+}
+
+.form-group label {
+    padding-right: 1em;
 }
 
 /* Tutores */
 .edit-user {
-    background-color: #fff;
+    /* background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-shadow: 0 0 10px #ccc;
@@ -33,7 +88,19 @@ td {
     width: 300px;
     position: absolute;
     margin-left: 10em;
-    margin-top: -10em;
+    margin-top: -10em; */
+
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px #ccc;
+    padding: 20px;
+    width: 100%;
+    
+
+    position: fixed;
+    top: 0;
+    
 }
 
 .edit-user form {

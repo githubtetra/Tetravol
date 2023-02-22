@@ -32,7 +32,7 @@ const Tutores = () => {
         id: 0,
         username: "",
         password: "",
-        role: 0,
+        role: 3,
         group: "",
     });
 
@@ -46,7 +46,8 @@ const Tutores = () => {
     }
 
     const getStudents: Function = async (): Promise<void> => {
-        const data = await api.getStudentByIdGroup(localStorage.getItem('group_id'));
+        // const data = await api.getStudentByIdGroup(localStorage.getItem('group_id'));
+        const data = await api.getAllGroupMembers(localStorage.getItem('group_id'));
         setStudents(data);
     }
 
@@ -73,10 +74,22 @@ const Tutores = () => {
             id: 0,
             username: "",
             password: "",
-            role: 0,
+            role: 3,
             group: localStorage.getItem('group_id') === null ? "" : localStorage.getItem('group_id')!,
         });
     }
+
+    const deleteStudent: Function = async (id: number): Promise<void> => {
+        await api.deleteUser(id);
+        getStudents();
+    }
+
+    const addUser: Function = async (): Promise<void> => {
+        newuser.group = localStorage.getItem('group_id') === null ? "" : localStorage.getItem('group_id')!;
+        await api.addUser(newuser);
+        getStudents();
+    }
+    
 
     useEffect(() => {
         getStudents();
@@ -87,24 +100,32 @@ const Tutores = () => {
         <div>
             <h1>Tutores</h1>
             
-            {/* Add users */}
-            <div className="add-user">
-                <h2>Agregar usuario</h2>
-                <form>
-                    <label>Username</label>
-                    <input type="text" name="username" value={newuser.username} onChange={(e) => setNewUser({ ...newuser, username: e.target.value })} />
-                    <label>Password</label>
-                    <input type="text" name="password" value={newuser.password} onChange={(e) => setNewUser({ ...newuser, password: e.target.value })} />
-                    <label>Rol</label>
-                    <select name="role" value={newuser.role} onChange={(e) => setNewUser({ ...newuser, role: parseInt(e.target.value) })}>
-                        {/* <option value="1">Admin</option> */}
-                        <option value="3">Profesor</option>
-                        <option value="4">Estudiante</option>
-                    </select>
-                </form>
+			{/* Add users */}
+			<div className="add-user">
+				<h2>Afegir usuari</h2>
+				<form>
+					<div className="form-group">
+						<label>Nom d'usuari:</label>
+						<input type="text" name="username" value={newuser.username} onChange={(e) => setNewUser({ ...newuser, username: e.target.value })} />
+					</div>
 
-                <button onClick={() => { api.addUser(newuser); getStudents(); }}>Agregar</button>
-            </div>
+					<div className="form-group">
+						<label>Contrasenya:</label>
+						<input type="text" name="password" value={newuser.password} onChange={(e) => setNewUser({ ...newuser, password: e.target.value })} />
+					</div>
+
+					<div className="form-group">
+						<label>Rol:</label>
+						<select name="role" value={newuser.role} onChange={(e) => setNewUser({ ...newuser, role: parseInt(e.target.value) })}>
+							{/* <option value="1">Admin</option> */}
+							<option value="3">Professor</option>
+							<option value="4">Estudiant</option>
+						</select>
+					</div>
+				</form>
+
+				<button onClick={() => { addUser(); }}>Afegir</button>
+			</div>
                     
 
             <h2>{group.label}</h2>
@@ -130,7 +151,14 @@ const Tutores = () => {
                             <td>{student.group}</td>
                             <td>
                                 <button onClick={() => { editStudent(student.id) }}>Edit</button>
-                                <button onClick={() => { }}>Delete</button>
+
+                                {
+                                    student.id.toString() === localStorage.getItem('id') ? (
+                                        null
+                                    ) : (
+                                        <button onClick={() => { deleteStudent(student.id) }}>Delete</button>
+                                    )
+                                }
                             </td>
                         </tr>
                     ))}

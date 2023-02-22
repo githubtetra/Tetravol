@@ -128,9 +128,9 @@ const Admin = () => {
 	}
 
 	const editStudent: Function = async (id: number): Promise<void> => {
-        setEditing(true);
+		setEditing(true);
 		let gs = await api.getAllGroups();
-		let g:any = 0;
+		let g: any = 0;
 		for (let i = 0; i < gs.length; i++) {
 			console.log(gs[i].id_group);
 			let u = await api.funkipunkitrunki(id, gs[i].id_group);
@@ -150,7 +150,7 @@ const Admin = () => {
 			role: users.filter((user) => user.id === id)[0].role,
 			group: g,
 		});
-    }
+	}
 
 	const updateStudent: Function = async (id: number): Promise<void> => {
 		setEditing(false);
@@ -183,13 +183,40 @@ const Admin = () => {
 		<div>
 			<h1>Admin</h1>
 
-			<h2>All Groups</h2>
+			{/* Add users */}
+			<div className="add-user">
+				<h2>Afegir usuari</h2>
+				<form>
+					<div className="form-group">
+						<label>Nom d'usuari:</label>
+						<input type="text" name="username" value={newuser.username} onChange={(e) => setNewUser({ ...newuser, username: e.target.value })} />
+					</div>
+
+					<div className="form-group">
+						<label>Contrasenya:</label>
+						<input type="text" name="password" value={newuser.password} onChange={(e) => setNewUser({ ...newuser, password: e.target.value })} />
+					</div>
+
+					<div className="form-group">
+						<label>Rol:</label>
+						<select name="role" value={newuser.role} onChange={(e) => setNewUser({ ...newuser, role: parseInt(e.target.value) })}>
+							{/* <option value="1">Admin</option> */}
+							<option value="3">Professor</option>
+							<option value="4">Estudiant</option>
+						</select>
+					</div>
+				</form>
+
+				<button onClick={() => { addUser(); }}>Afegir</button>
+			</div>
+
+			<h2>Tots els grups</h2>
 			<table>
 				<thead>
 					<tr>
-						<th>Group</th>
+						<th>Grup</th>
 						<th>Tutor</th>
-						<th>Actions</th>
+						<th>Accions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -216,11 +243,11 @@ const Admin = () => {
 			<table>
 				<thead>
 					<tr>
-						<th>Username</th>
-						<th>Password</th>
-						<th>Role</th>
-						<th>Group</th>
-						<th>Actions</th>
+						<th>Nom d'usuari</th>
+						<th>Contrasenya</th>
+						<th>Rol</th>
+						<th>Grup</th>
+						<th>Accions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -233,12 +260,12 @@ const Admin = () => {
 								<td>{user.group}</td>
 								<td>
 									<button onClick={() => { editStudent(user.id) }}>
-										Edit
+									Edita
 									</button>
 									<button onClick={() => {
 										// deleteUser(user.id_user);
 									}}>
-										Delete
+										Suprimeix
 									</button>
 								</td>
 							</tr>

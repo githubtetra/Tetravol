@@ -1,5 +1,8 @@
 import axios from "axios";
 
+const ip = "138.68.98.150"
+const url = "http://192.100.20.167:3000/api/";
+
 interface User {
 	id: number;
 	username: string;
@@ -16,13 +19,14 @@ interface Group {
 
 // Get all users
 const getAllUsers:Function = async () => {
-    const res = await axios.get("http://192.100.20.167:3000/api/users");
+    const res = await axios.get(url + "users");
     return res.data.data;
 }
 
 // Get all groups
 const getAllGroups:Function = async () => {
-    const link = "http://192.100.20.167:3000/api/users/group";
+    
+    const link = url + "users/group";
     const res = await axios.get(link);
     return res.data.data;
 }
@@ -30,7 +34,7 @@ const getAllGroups:Function = async () => {
 // Edit user
 const editUser:Function = async (user:User) => {
     const res = await axios.post(
-        `http://192.100.20.167:3000/api/user/update/${user.id}`,
+        url + `user/update/${user.id}`,
         {
             username: user.username,
             password: user.password,
@@ -43,7 +47,7 @@ const editUser:Function = async (user:User) => {
 
 // Edit group
 const editGroup:Function = async (name: string, id: number) => {
-    const link = "http://192.100.20.167:3000/api/group/update/" + id;
+    const link = url + "group/update/" + id;
 
     const res = await axios.post(link, {
         label: name
@@ -52,7 +56,7 @@ const editGroup:Function = async (name: string, id: number) => {
 
 // Add group
 const addGroup:Function = async (group: Group) => {
-    const link = "http://192.100.20.167:3000/api/group/create"
+    const link = url + "group/create"
     const res = await axios.post(link, {
         label: group.label
     });
@@ -60,8 +64,17 @@ const addGroup:Function = async (group: Group) => {
 
 // Add user
 const addUser:Function = async (user: User) => {
+    console.log(
+        url + `create/user`,
+        {
+            username: user.username,
+            password: user.password,
+            role: user.role,
+            group: user.group,
+        }
+    )
     const res = await axios.post(
-        `http://192.100.20.167:3000/api/user/update/${user.id}`,
+        url + `create/user`,
         {
             username: user.username,
             password: user.password,
@@ -73,14 +86,14 @@ const addUser:Function = async (user: User) => {
 
 // Get group by id
 const getGroupById:Function = async (id: number) => {
-    let link = "http://192.100.20.167:3000/api/get/group/" + id;
+    let link = url + "get/group/" + id;
     const res = await axios.post(link);
     return res.data.data;
 }
 
 // Get group tutor by id
 const getGroupTutorById:Function = async (id: number) => {
-    let link = "http://192.100.20.167:3000/api/get/teacher";
+    let link = url + "get/teacher";
     const res = await axios.get(link);
 
     let tutor = res.data.data.filter((tutor: any) => tutor.id === id);
@@ -89,12 +102,17 @@ const getGroupTutorById:Function = async (id: number) => {
 
 // Get sudent by id group
 const getStudentByIdGroup:Function = async (id: number) => {
-    const res = await axios.post('http://192.100.20.167:3000/api/users/group/' + id);
+    const res = await axios.post(url + 'users/group/' + id);
+    return res.data.data;
+}
+
+const getAllGroupMembers:Function = async (id: number) => {
+    const res = await axios.get(url + 'getall/group/' + id);
     return res.data.data;
 }
 
 const funkipunkitrunki:Function = async (id_user: number, id_group: number) => {
-    let link = "http://192.100.20.167:3000/api/users/group/" + id_group;
+    let link = url + "users/group/" + id_group;
     const res = await axios.post(link);
     console.log(res.data.data);
     for (let i = 0; i < res.data.data.length; i++) {
@@ -106,6 +124,11 @@ const funkipunkitrunki:Function = async (id_user: number, id_group: number) => {
     // let trunko = res.data.data.filter((tutor: any) => tutor.id === id_user);
     // console.log(trunko + "FUNKO");
     // return trunko;
+}
+
+const deleteUser:Function = async (id: number) => {
+    const res = await axios.post(url + "user/delete/" + id);
+    return res.data.data;
 }
 
 
@@ -124,4 +147,4 @@ const from_id_to_role:Function = (id: number) => {
     }
 }
 
-export default { funkipunkitrunki, getAllUsers, getAllGroups, editUser, editGroup, addGroup, addUser, getGroupById, getStudentByIdGroup, from_id_to_role, getGroupTutorById };
+export default { funkipunkitrunki, getAllUsers, getAllGroups, editUser, editGroup, addGroup, addUser, getGroupById, getStudentByIdGroup, from_id_to_role, getGroupTutorById, deleteUser, getAllGroupMembers };
