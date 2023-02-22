@@ -14,6 +14,19 @@ body {
     width: 300px;
 }
 
+.login form {
+    margin: 0 auto;
+    width: 200px;
+}
+
+.login form input {
+    margin: 5px 0;
+}
+
+.login form button {
+    margin: 5px 0;
+}
+
 /* General */
 table {
     width: 100%;

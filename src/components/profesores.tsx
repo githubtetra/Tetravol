@@ -32,7 +32,7 @@ const Profesores = () => {
         id: 0,
         username: "",
         password: "",
-        role: 0,
+        role: 4,
         group: "",
     });
 
@@ -73,7 +73,7 @@ const Profesores = () => {
             id: 0,
             username: "",
             password: "",
-            role: 0,
+            role: 4,
             group: localStorage.getItem('group_id') === null ? "" : localStorage.getItem('group_id')!,
         });
     }
@@ -85,7 +85,16 @@ const Profesores = () => {
 
     const addUser: Function = async (): Promise<void> => {
         newuser.group = localStorage.getItem('group_id') === null ? "" : localStorage.getItem('group_id')!;
-        await api.addUser(newuser);
+        newuser.role = 4;
+
+        let nuser:Student = {
+            id : 0,
+            username: newuser.username,
+            password: newuser.password,
+            role: 4,
+            group: localStorage.getItem('group_id') === null ? "" : localStorage.getItem('group_id')!,
+        }
+        await api.addUser(nuser);
         getStudents();
     }
     
