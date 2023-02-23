@@ -142,26 +142,26 @@ const Tutores = () => {
                 <tbody>
                     <tr>
                     </tr>
-                    {/* Show all student information and when click button edit change text to input fields */}
-                    {students.map((student) => (
-                        <tr key={student.id}>
-                            <td>{student.username}</td>
-                            <td>{student.password}</td>
-                            <td>{api.from_id_to_role(student.role)}</td>
-                            <td>{student.group}</td>
-                            <td>
-                                <button onClick={() => { editStudent(student.id) }}>Edit</button>
-
-                                {
-                                    student.id.toString() === localStorage.getItem('id') ? (
-                                        null
-                                    ) : (
-                                        <button onClick={() => { deleteStudent(student.id) }}>Delete</button>
-                                    )
-                                }
-                            </td>
-                        </tr>
-                    ))}
+					{students.map((user: Student) => {
+						return (
+							<tr>
+								<td>{user.username}</td>
+								<td>{user.password}</td>
+								<td>{api.from_id_to_role(user.role)}</td>
+								<td>{user.group}</td>
+								<td>
+									<button onClick={() => { editStudent(user.id) }}>
+									Edita
+									</button>
+									<button onClick={() => {
+										deleteStudent(user.id);
+									}}>
+										Suprimeix
+									</button>
+								</td>
+							</tr>
+						);
+					})}
                 </tbody>
             </table>
 

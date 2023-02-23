@@ -2,8 +2,8 @@ import axios from "axios";
 
 const ip = "138.68.98.150"
 const local = "192.100.20.167"
-const url = "http://ccitubapi.gamecademy.com:3000/api/"
-const uri = "http://138.68.98.150:3000/api/";
+const uri = "http://ccitubapi.gamecademy.com:3000/api/"
+const url = "http://138.68.98.150:3001/api/";
 
 interface User {
 	id: number;
@@ -75,6 +75,7 @@ const addUser:Function = async (user: User) => {
             group: user.group,
         }
     )
+
     const res = await axios.post(
         url + `create/user`,
         {
@@ -149,4 +150,4 @@ const from_id_to_role:Function = (id: number) => {
     }
 }
 
-export default { funkipunkitrunki, getAllUsers, getAllGroups, editUser, editGroup, addGroup, addUser, getGroupById, getStudentByIdGroup, from_id_to_role, getGroupTutorById, deleteUser, getAllGroupMembers };
+export default { funkipunkitrunki, getAllUsers, getAllGroups, editUser, editGroup, addGroup, addUser, getGroupById, getStudentByIdGroup, from_id_to_role, getGroupTutorById, deleteUser, getAllGroupMembers, url };
