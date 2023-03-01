@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import api from "../hooks/hooks"
+import api from "../src/hooks/hooks"
 import "./styles.css";
 import { debug, group, time } from "console";
 

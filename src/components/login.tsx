@@ -1,51 +1,76 @@
-// api http://192.100.20.167:3000/api/status
 import React, { useState } from 'react';
 import axios from 'axios';
 import api from '../hooks/hooks';
-import './styles.css'
+import ecrypt from '../components/comp/encrypt';
+import './css/styles.css'
 
-interface Props {
+interface User {
     id: number;
     name: string;
-    pass: string;
-    role: string;
-    handleLogin: (e: React.FormEvent) => void;
+    lastname: string;
+    email: string;
+    password: string;
+    group: number;
+    subgroup: number;
+    role: number;
 }
 
-const Login: React.FC<Props> = ({ id, name, pass, role, handleLogin }) => {
-    const loginUrl: string = api.url + 'login'
 
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+const Login = () => {
+    const [user, setUser] = useState<User>({
+        id: 0,
+        name: "",
+        lastname: "",
+        email: "",
+        password: "",
+        group: 0,
+        subgroup: 0,
+        role: 0,
+    });
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        // Send the username and password to the server and get the id, user, and role
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+
+    const HandleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+        // console.log(email);
         e.preventDefault();
-        const { data } = await axios.post(loginUrl, {
-            username: username,
-            password: password
-        });
 
-        // See if response is not 401
-        if (data.status === "success") {
-            // Add the id, user, and role to local storage
-            localStorage.setItem('id', data.data.id);
-            localStorage.setItem('username', data.data.username);
-            localStorage.setItem('password', password)
-            localStorage.setItem('role', data.data.role);
-            localStorage.setItem('group_id', data.data.group);
-
-            // Call the handleLogin function from App.tsx
-            handleLogin(e);
+        if (email == "" || password == "") {
+            console.log("Error: Empty fields");
+            return;
         }
+
+        await api.login(email, password).then((res:any) => {
+            console.log(res);
+            setUser(
+                {
+                    id: res.data.id,
+                    name: res.data.name,
+                    lastname: res.data.lastname,
+                    email: res.data.email,
+                    password: res.data.password,
+                    group: res.data.group,
+                    subgroup: res.data.subgroup,
+                    role: res.data.role,
+                }
+            );
+            console.log(user.email);
+
+            localStorage.setItem('email', user.email);
+            localStorage.setItem('password', ecrypt.encrypt(user.password));
+            
+        }).catch((err:any) => {
+            console.log("Error: ")
+            console.log(err);
+        });
     }
 
     return (
         <div className="login">
             <img src="https://eurolab.com.es/wp-content/uploads/2019/02/UB-BARNA.png" alt="Logo" width="100" height="100" className="logo" />
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={HandleLogin}>
                 <label htmlFor="username">Username</label>
-                <input type="text" name="username" value={username} onChange={e => setUsername(e.target.value)} />
+                <input type="text" name="username" value={email} onChange={e => setEmail(e.target.value)} />
                 <label htmlFor="password">Password</label>
                 <input type="password" name="password" value={password} onChange={e => setPassword(e.target.value)} />
                 <button type="submit">Login</button>
