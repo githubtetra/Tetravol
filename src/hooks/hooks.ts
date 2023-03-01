@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const ip = "138.68.98.150"
-const local = "192.100.20.167"
-const uri = "http://ccitubapi.gamecademy.com:3000/api/"
-const url = "http://138.68.98.150:3001/api/";
+const ip = "138.68.98.150:3001"
+const iplocal = "192.100.20.167:3000"
+const uri = "ccitubapi.gamecademy.com:3000"
+const urli = "http://138.68.98.150:3001/api/";
+const url = "http://"+iplocal+"/api/";
 
 interface User {
 	id: number;

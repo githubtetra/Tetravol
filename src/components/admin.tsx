@@ -77,9 +77,9 @@ const Admin = () => {
 
 
 	const editUser: Function = async (user: User): Promise<void> => {
-        setEditing(true);
-        const data = users.find((student) => student.id === user.id);
-        if (data) setNewUser(data);
+		setEditing(true);
+		const data = users.find((student) => student.id === user.id);
+		if (data) setNewUser(data);
 		setEditing(false);
 		getUsers();
 
@@ -92,23 +92,23 @@ const Admin = () => {
 		});
 	};
 
-    const addUser: Function = async (): Promise<void> => {
+	const addUser: Function = async (): Promise<void> => {
 
-        let nuser:User = {
-            id : 0,
-            username: newuser.username,
-            password: newuser.password,
-            role: newuser.role,
+		let nuser: User = {
+			id: 0,
+			username: newuser.username,
+			password: newuser.password,
+			role: newuser.role,
 			group: newuser.group
-        }
+		}
 		if (nuser.role === 0) nuser.role = 4;
 		if (nuser.group == "") {
 			nuser.group = groups[0].id_group.toString();
 		}
 
-        await api.addUser(nuser);
-        getUsers();
-    }
+		await api.addUser(nuser);
+		getUsers();
+	}
 
 	const editGroup: Function = async (name: string, id: number): Promise<void> => {
 		const link = "http://192.100.20.167:3000/api/group/update/" + id;
@@ -127,16 +127,16 @@ const Admin = () => {
 		getGroups();
 	}
 
-    const editStudent: Function = async (id: number): Promise<void> => {
-        setEditing(true);
-        const data = users.find((student) => student.id === id);
-        if (data) setNewUser(data);
-    }
+	const editStudent: Function = async (id: number): Promise<void> => {
+		setEditing(true);
+		const data = users.find((student) => student.id === id);
+		if (data) setNewUser(data);
+	}
 
 	const deleteStudent: Function = async (id: number): Promise<void> => {
-        await api.deleteUser(id);
-        getUsers();
-    }
+		await api.deleteUser(id);
+		getUsers();
+	}
 
 	const updateStudent: Function = async (id: number): Promise<void> => {
 		setEditing(false);
@@ -207,7 +207,7 @@ const Admin = () => {
 
 				<button onClick={() => { addUser(); }}>Afegir</button>
 			</div>
-			
+
 			<br></br><br></br>
 			{/* Add groups */}
 			<div className="add-user">
@@ -221,7 +221,7 @@ const Admin = () => {
 
 				<button onClick={() => { addGroup(newgroup); }}>Afegir</button>
 			</div>
-			
+
 			<br></br>
 			<h2>Tots els grups</h2>
 			<table>
@@ -275,7 +275,7 @@ const Admin = () => {
 								<td>{user.group}</td>
 								<td>
 									<button onClick={() => { editStudent(user.id) }}>
-									Edita
+										Edita
 									</button>
 									<button onClick={() => {
 										deleteStudent(user.id);
@@ -337,7 +337,7 @@ const Admin = () => {
 						<button onClick={() => { updateGroup() }}>Guardar</button>
 						<button onClick={() => { cancelEditGroup() }}>Cancelar</button>
 
-						</div>
+					</div>
 				) : (
 					<div> </div>
 				)

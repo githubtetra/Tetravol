@@ -17,6 +17,7 @@ body {
 }
 
 .login {
+    margin-top:30%;
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
