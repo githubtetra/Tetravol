@@ -1,5 +1,7 @@
 import React from "react";
 import Reade from "../comp/read_excel";
+import Admin from "./admin";
+import Estudiante from "./estudiantes";
 
 interface User {
     id: number;
@@ -20,16 +22,9 @@ interface Group {
 }
 
 const Dashboard = () => {
-
-    // const user: User = {
-    //     id: parseInt(localStorage.getItem('id') || '0'),
-    //     username: localStorage.getItem('username') || '',
-    //     role: localStorage.getItem('role') || '' // 1: admin, 2: teacher, 3: student
-    // }
-
     const logout:Function = ():void => {
         localStorage.removeItem('id');
-        localStorage.removeItem('username');
+        localStorage.removeItem('email');
         localStorage.removeItem('password');
         localStorage.removeItem('role');
 
@@ -43,6 +38,10 @@ const Dashboard = () => {
             <h1>Dashboard</h1>
 
             <button onClick={() => {logout()}}>Logout</button>
+
+            {
+                localStorage.getItem('role') == "1" ? <Admin /> : <Estudiante />
+            }
         </div>
     );
 }

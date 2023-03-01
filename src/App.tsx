@@ -13,10 +13,15 @@ interface User {
 
 function App() {
 
+  const handleLogin = (e: React.FormEvent) => {
+    console.log("Login");
+    window.location.reload();
+  }
+
   return (
     <div className="App">
       {
-        <Login />
+        localStorage.getItem('id') ? <Dashboard /> : <Login handleLogin={handleLogin} />
       }
 
     </div>

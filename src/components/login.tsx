@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import api from '../hooks/hooks';
-import ecrypt from '../components/comp/encrypt';
+import dec from '../components/comp/encrypt';
 import './css/styles.css'
 
 interface User {
@@ -15,8 +15,12 @@ interface User {
     role: number;
 }
 
+interface Props {
+    handleLogin: (e: React.FormEvent) => void;
+}
 
-const Login = () => {
+
+const Login: React.FC<Props> = ({ handleLogin })  => {
     const [user, setUser] = useState<User>({
         id: 0,
         name: "",
@@ -40,24 +44,12 @@ const Login = () => {
             return;
         }
 
-        await api.login(email, password).then((res:any) => {
-            console.log(res);
-            setUser(
-                {
-                    id: res.data.id,
-                    name: res.data.name,
-                    lastname: res.data.lastname,
-                    email: res.data.email,
-                    password: res.data.password,
-                    group: res.data.group,
-                    subgroup: res.data.subgroup,
-                    role: res.data.role,
-                }
-            );
-            console.log(user.email);
-
-            localStorage.setItem('email', user.email);
-            localStorage.setItem('password', ecrypt.encrypt(user.password));
+        api.login(email, password).then((res:any) => {
+            localStorage.setItem('id', res.data.id);
+            localStorage.setItem('email', email);
+            localStorage.setItem('password', password);
+            localStorage.setItem('role', res.data.role);
+            handleLogin(e);
             
         }).catch((err:any) => {
             console.log("Error: ")

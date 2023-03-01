@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import Iframe from 'react-iframe'
 import axios from 'axios';
-import './estudiantes.css'
+import '../css/estudiantes.css'
 import api from '../../hooks/hooks';
 
 const Estudiante = () => {
