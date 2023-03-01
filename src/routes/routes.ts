@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import connection from '../db/connection';
-import { SendMail } from '../utils/mailer'; 
+import { SendMail } from '../utils/mailer';
 
 const router = Router();
 
@@ -150,9 +150,17 @@ router.post('/users/register', async (req, res) => {
 
     SendMail(email, name, passwordGen, email);
 
-    connection.query('INSERT INTO user_accounts (name, lastname, email, password, `group`, subgroup, `role`) VALUES (?,?,?,?,?,?,?)', [name, lastname, email, passwordGen, group, subgroup, role], (err, _result) => {
+    connection.query('SELECT * FROM user_accounts WHERE email = ?', [email], (err, result) => {
         if (err) throw err;
-        res.json({ status: 'success', message: 'Usuario creado correctamente' });
+        if (result.length > 0) {
+            res.json({ status: 'error', message: 'El usuario ya existe' });
+            return;
+        } else {
+            connection.query('INSERT INTO user_accounts (name, lastname, email, password, `group`, subgroup, `role`) VALUES (?,?,?,?,?,?,?)', [name, lastname, email, passwordGen, group, subgroup, role], (err, _result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Usuario creado correctamente' });
+            });
+        }
     });
 });
 
@@ -170,7 +178,7 @@ router.post('/users/reset/:id', async (req, res) => {
     }
 
     let passwordGen: any = await generatePassword(6)
-    let data:any = [];
+    let data: any = [];
 
     connection.query('SELECT email, name FROM user_accounts WHERE id = ?', [id], (err, result) => {
         if (err) throw err;
@@ -257,7 +265,8 @@ router.post('/users/login', (req, res) => {
                         if (err) throw err;
                         console.log('Niveles creados');
                         res.json({
-                            status: 'success', message: 'Bienvenido', data: data, "levels": { "id": data.id, "level_1": 1, "level_2": 0, "level_3": 0 } });
+                            status: 'success', message: 'Bienvenido', data: data, "levels": { "id": data.id, "level_1": 1, "level_2": 0, "level_3": 0 }
+                        });
                     });
                 } else {
                     res.json({ status: 'success', message: 'Bienvenido', data: data, levels: result[0] });
