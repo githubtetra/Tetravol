@@ -41,6 +41,7 @@ const Login: React.FC<Props> = ({ handleLogin })  => {
 
         if (email == "" || password == "") {
             console.log("Error: Empty fields");
+            alert("Error: Empty fields");
             return;
         }
 
@@ -54,6 +55,7 @@ const Login: React.FC<Props> = ({ handleLogin })  => {
         }).catch((err:any) => {
             console.log("Error: ")
             console.log(err);
+            alert("Error: " + err);
         });
     }
 

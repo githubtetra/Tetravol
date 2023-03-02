@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-, "save/admin.tsx"  ]
+, "save/admin.tsx", "src/components/dashboard/profesor.tsx"  ]
 }

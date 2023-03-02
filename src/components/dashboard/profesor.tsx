@@ -21,7 +21,10 @@ interface Group {
     id_tutor: number | null; // null if it is a secondary group
 }
 
-const Admin = () => {
+let group_profesor = -1;
+let subgrou_profesor = -1;
+
+const Profesor = () => {
 
     const number_to_Role = (role: number): string => {
         switch (role) {
@@ -65,16 +68,55 @@ const Admin = () => {
 
     const getUsers: Function = async (): Promise<void> => {
         const res = await api.getAllUsers();
-        console.log(res.data);
-        setUsers(res.data);
+        let all_users = res.data;
+        let tutor_id = localStorage.getItem("id");
+        console.log("Tutor id: " + tutor_id);
+
+        // Find the tutor's group
+        if (group_profesor == -1) {
+            let tutor_group = -1;
+            for (let i = 0; i < all_users.length; i++) {
+                console.log(all_users[i].id + " " + tutor_id);
+                if (all_users[i].id == tutor_id) {
+                    console.log("Tutor group: " + all_users[i].group);
+                    tutor_group = all_users[i].group;
+                    group_profesor = tutor_group;
+                    break;
+                }
+            }
+        }
+
+        let re = await api.getUserById(tutor_id);
+        subgrou_profesor = re.data.subgroup;
+
+        if (group_profesor == -1) {
+            console.log("Error: Tutor group not found:" + group_profesor);
+            alert("Error: Tutor group not found");
+            return;
+        }
+        // Filter the users that are in the tutor's group
+        let tutor_users = all_users.filter((user: User) => user.group === group_profesor);
+
+        console.log(tutor_users);
+
+        setUsers(tutor_users);
     };
 
     const addUser: Function = async (user: User): Promise<void> => {
-        if (user.group === 0) {
-            user.group = 1;
+        if (group_profesor == -1) {
+            console.log("Error: Tutor group not found:" + group_profesor);
+            alert("Error: Tutor group not found");
+            getUsers();
+            return;
+        } else if (subgrou_profesor == -1) {
+            console.log("Error: Tutor subgroup not found:" + subgrou_profesor);
+            alert("Error: Tutor subgroup not found");
+            getUsers();
+            return;
         }
-        user.subgroup = null;
-        user.role = 2;
+        user.group = group_profesor;
+        user.role = 4;
+        user.subgroup = subgrou_profesor;
 
         if (user.name === "" || user.lastname === "" || user.email === "") {
             alert("Please fill all the fields");
@@ -93,8 +135,8 @@ const Admin = () => {
             lastname: "",
             email: "",
             password: "",
-            group: user.group,
-            subgroup: 0,
+            group: group_profesor,
+            subgroup: subgrou_profesor,
             role: 0,
         });
         getUsers();
@@ -145,9 +187,9 @@ const Admin = () => {
     });
 
     const getGroups: Function = async (): Promise<void> => {
-        const res = await api.getAllGroups();
-
-        setGroups(res.data);
+        const res = await api.getTutorSubgroups(localStorage.getItem("id"));
+        console.log(res);
+        setGroups(res.group);
     };
 
     const addGroup: Function = async (group: Group): Promise<void> => {
@@ -156,27 +198,36 @@ const Admin = () => {
             return;
         }
 
-        if (group.id_tutor === -1) {
-            alert("Please select a tutor");
+        if (group_profesor == -1) {
+            console.log("Error: Tutor group not found:" + group_profesor);
+            alert("Error: Tutor group not found");
+            getGroups();
             return;
         }
 
-        await api.addPrimaryGroup(group);
+        setNewGroup({
+            id: 0,
+            type: "subgroup",
+            label: "",
+            id_tutor: group_profesor,
+        });
+
+
+        await api.addSecondaryGroup(group.label, group_profesor);
         getGroups();
     };
 
 
     useEffect(() => {
         getUsers();
-        getGroups();
     }, []);
 
     return (
         <div>
-            <h1>Admin</h1>
+            <h1>Profesor</h1>
 
             {/* Add Tutor */}
-            <h2>Add Tutor</h2>
+            <h2>Add Estudiante</h2>
             <form>
                 <label>Name</label>
                 <input type="text" name="name" value={newuser.name} onChange={(e) => setNewUser({ ...newuser, name: e.target.value })} />
@@ -184,69 +235,12 @@ const Admin = () => {
                 <input type="text" name="lastname" value={newuser.lastname} onChange={(e) => setNewUser({ ...newuser, lastname: e.target.value })} />
                 <label>Email</label>
                 <input type="email" name="email" value={newuser.email} onChange={(e) => setNewUser({ ...newuser, email: e.target.value })} />
-                <label>Group</label>
-                <select name="group" value={newuser.group} onChange={(e) => setNewUser({ ...newuser, group: parseInt(e.target.value) })}>
-                    {
-                        groups.map((group: Group) => (
-                            <option key={group.id} value={group.id}>{group.label}</option>
-                        ))
-                    }
-                </select>
+
 
                 <button type="button" onClick={() => {
                     addUser(newuser)
-                }}>Add Tutor</button>
+                }}>Add Profesor</button>
             </form>
-
-            {/* Add group */}
-            <h2>Add Group</h2>
-            <form>
-                <label>Label</label>
-                <input type="text" name="label" value={newgroup.label} onChange={(e) => setNewGroup({ ...newgroup, label: e.target.value })} />
-                <label>Tutor</label>
-                <select name="tutor" value={
-                    newgroup.id_tutor === null ? -1 : newgroup.id_tutor
-                } onChange={(e) => setNewGroup({ ...newgroup, id_tutor: parseInt(e.target.value) })}>
-                    <option value={-1}>-- Select Tutor --</option>
-                    {
-                        users.map((user: User) => (
-                            user.role === 2 ? <option key={user.id} value={user.id}>{user.name} {user.lastname}</option> : null
-                        ))
-                    }
-                </select>
-
-                <button type="button" onClick={() => { addGroup(newgroup) }}>Add Group</button>
-            </form>
-
-
-            {/* See all groups */}
-            <h2>All Groups</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Label</th>
-                        <th>Tutor</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        groups.map((group: Group) => (
-                            <tr key={group.id}>
-                                <td>{group.id}</td>
-                                <td>{group.label}</td>
-                                {/* <td>{group.id_tutor}</td> */}
-                                <td>{getUserName(group.id_tutor)}</td>
-                                <td>
-                                    <button disabled>Edit</button>
-                                    <button disabled>Delete</button>
-                                </td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-            </table>
 
             {/* See all users */}
             <h2>All Users</h2>
@@ -257,8 +251,6 @@ const Admin = () => {
                         <th>Name</th>
                         <th>Lastname</th>
                         <th>Email</th>
-                        <th>Group</th>
-                        {/* <th>Subgroup</th> */}
                         <th>Role</th>
                         <th>Actions</th>
                     </tr>
@@ -271,9 +263,11 @@ const Admin = () => {
                                 <td>{user.name}</td>
                                 <td>{user.lastname}</td>
                                 <td>{user.email}</td>
-                                <td>{user.group}</td>
-                                {/* <td>{user.subgroup}</td> */}
-                                <td>{number_to_Role(user.role)}</td>
+                                <td>
+                                    {
+                                        number_to_Role(user.role)
+                                    }
+                                </td>
                                 <td>
                                     <button onClick={() => {
                                         editUser(user)
@@ -310,20 +304,8 @@ const Admin = () => {
                                 <input type="text" value={editCurrentUser.email} onChange={(e) => setEditCurrentUser({ ...editCurrentUser, email: e.target.value })} />
                             </div>
 
-                            <div className="editblock">
-                                <label>Grupo: </label>
-                                <select value={editCurrentUser.group} onChange={(e) => setEditCurrentUser({ ...editCurrentUser, group: parseInt(e.target.value) })}>
-                                    {
-                                        groups.map((group: Group) => (
-                                            <option key={group.id} value={group.id}>{group.label}</option>
-                                        ))
-                                    }
-                                </select>
-                            </div>
-
-
                             <button type="button" onClick={() => {
-                                updateUser(editCurrentUser)
+                                updateUser(editCurrentUser.id, editCurrentUser)
                             }}>Guardar</button>
                             <button>Cancelar</button>
                         </form>
@@ -338,4 +320,4 @@ const Admin = () => {
     );
 };
 
-export default Admin;
+export default Profesor;

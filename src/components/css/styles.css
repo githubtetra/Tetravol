@@ -132,12 +132,18 @@ td {
 .edit-user form {
     margin: 0 auto;
     width: 200px;
+    right: 0    ;
 }
 
-.edit-user form input {
-    margin: 5px 0;
+.editblock {
+    display: block;
+    
+    width: auto;
+    display: flex;
+
+    padding: 0.5em;
 }
 
-.edit-user form button {
-    margin: 5px 0;
+.editblock label {
+    padding-right: 0.2em;
 }

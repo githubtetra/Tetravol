@@ -2,6 +2,8 @@ import React from "react";
 import Reade from "../comp/read_excel";
 import Admin from "./admin";
 import Estudiante from "./estudiantes";
+import Tutor from "./tutor";
+import Profesor from "./profesor";
 
 interface User {
     id: number;
@@ -40,7 +42,11 @@ const Dashboard = () => {
             <button onClick={() => {logout()}}>Logout</button>
 
             {
-                localStorage.getItem('role') == "1" ? <Admin /> : <Estudiante />
+                localStorage.getItem('role') == "1" ? <Admin /> : 
+                localStorage.getItem('role') == "2" ? <Tutor /> :
+                localStorage.getItem('role') == "3" ? <Profesor /> :
+                localStorage.getItem('role') == "4" ? <Estudiante /> :
+                <div>ERROR</div>
             }
         </div>
     );

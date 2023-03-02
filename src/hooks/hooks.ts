@@ -64,6 +64,28 @@ const addUser:Function = async (user:User) => {
     return response.data;
 }
 
+const deleteUser:Function = async (id:number) => {
+    const response = await axios.post(url+"users/delete/" + id);
+    return response.data;
+}
+
+const updateUser:Function = async (user:User) => {
+    const response = await axios.post(url+"users/update/" + user.id, {
+        name: user.name,
+        lastname: user.lastname,
+        email: user.email,
+        group: user.group,
+        subgroup: user.subgroup,
+        role: user.role
+    });
+    return response.data;
+}
+
+const getTutorSubgroups:Function = async (id:number) => {
+    const response = await axios.post(url+"group/tutor/" + id);
+    return response.data;
+}
+
 /// Groups
 const getAllGroups:Function = async () => {
     const response = await axios.get(url+"groups/" + "primary");
@@ -79,4 +101,21 @@ const addPrimaryGroup:Function = async (group:Group) => {
     return response.data;
 }
 
-export default { test, login, getAllUsers, getAllGroups, getUserById, addUser, addPrimaryGroup };
+
+// Subgroups
+const addSecondaryGroup:Function = async (label_g: string, primary_id: string) => {
+    const response = await axios.post(url+"groups/create/secondary", {
+        label: label_g,
+        id_primary: primary_id,
+    }
+    );
+    return response.data;
+}
+
+
+// const deletePrimaryGroup:Function = async (id:number) => {
+//     const response = await axios.post(url+"groups/delete/primary/" + id);
+//     return response.data;
+// }
+
+export default { test, login, getAllUsers, getAllGroups, getUserById, addUser, addPrimaryGroup, deleteUser, updateUser, getTutorSubgroups, addSecondaryGroup };
