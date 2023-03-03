@@ -15,7 +15,9 @@ router.get('/api/status', (_req, res) => {
 // Create group (primary or secondary) //
 router.post('/groups/create/:type', (req, res) => {
     const { type } = req.params;
-    const { label, id_tutor } = req.body;
+    const { label, id_tutor, id_primary } = req.body;
+
+    console.log(label, id_tutor, id_primary);
 
     if (!label || !type) {
         res.json({ status: 'error', message: 'Faltan datos' });
@@ -26,11 +28,18 @@ router.post('/groups/create/:type', (req, res) => {
         case 'primary':
             connection.query('INSERT INTO groups_primary (label, id_tutor) VALUES (?,?)', [label, id_tutor], (err, _result) => {
                 if (err) throw err;
-                res.json({ status: 'success', message: 'Grupo creado correctamente' });
+                connection.query('SELECT id FROM groups_primary WHERE label = ?', [label], (err, result) => {
+                    if (err) throw err;
+                    const id = result[0].id;
+                    connection.query('UPDATE user_accounts SET `group` = ? WHERE id = ?', [id, id_tutor], (err, _result) => {
+                        if (err) throw err;
+                        res.json({ status: 'success', message: 'Grupo creado correctamente' });
+                    });
+                });
             });
             break;
         case 'secondary':
-            connection.query('INSERT INTO groups_secundary (label) VALUES (?)', [label], (err, _result) => {
+            connection.query('INSERT INTO groups_secundary (label, id_primary) VALUES (?,?)', [label, id_primary], (err, _result) => {
                 if (err) throw err;
                 res.json({ status: 'success', message: 'Grupo creado correctamente' });
             });
@@ -85,24 +94,24 @@ router.post('/groups/update/:type/:id', (req, res) => {
 });
 
 // Delete group by id (primary or secondary) //
-router.post('/groups/delete/:type/:id', (req, res) => {
-    const { type, id } = req.params;
+// router.post('/groups/delete/:type/:id', (req, res) => {
+//     const { type, id } = req.params;
 
-    switch (type) {
-        case 'primary':
-            connection.query('DELETE FROM groups_primary WHERE id = ?', [id], (err, _result) => {
-                if (err) throw err;
-                res.json({ status: 'success', message: 'Grupo eliminado correctamente' });
-            });
-            break;
-        case 'secondary':
-            connection.query('DELETE FROM groups_secundary WHERE id = ?', [id], (err, _result) => {
-                if (err) throw err;
-                res.json({ status: 'success', message: 'Grupo eliminado correctamente' });
-            });
-            break;
-    }
-});
+//     switch (type) {
+//         case 'primary':
+//             connection.query('DELETE FROM groups_primary WHERE id = ?', [id], (err, _result) => {
+//                 if (err) throw err;
+//                 res.json({ status: 'success', message: 'Grupo eliminado correctamente' });
+//             });
+//             break;
+//         case 'secondary':
+//             connection.query('DELETE FROM groups_secundary WHERE id = ?', [id], (err, _result) => {
+//                 if (err) throw err;
+//                 res.json({ status: 'success', message: 'Grupo eliminado correctamente' });
+//             });
+//             break;
+//     }
+// });
 
 // Get group by id (primary or secondary) //
 router.get('/groups/:type/:id', (req, res) => {
@@ -214,14 +223,14 @@ router.get('/users/:id', (req, res) => {
 // Update user by id //
 router.post('/users/update/:id', (req, res) => {
     const { id } = req.params;
-    const { name, lastname, email, password, group, subgroup, role } = req.body;
+    const { name, lastname, email, group, subgroup, role } = req.body;
 
-    if (!name || !lastname || !email || !password || !group || !subgroup || !role) {
+    if (!name || !lastname || !email || !group || !role) {
         res.json({ status: 'error', message: 'Faltan datos' });
         return;
     }
 
-    connection.query('UPDATE user_accounts SET name = ?, lastname = ?, email = ?, password = ?, `group` = ?, subgroup_id = ?, `role` = ? WHERE id = ?', [name, lastname, email, password, group, subgroup, role, id], (err, _result) => {
+    connection.query('UPDATE user_accounts SET name = ?, lastname = ?, email = ?, `group` = ?, subgroup = ?, `role` = ? WHERE id = ?', [name, lastname, email, group, subgroup, role, id], (err, _result) => {
         if (err) throw err;
         res.json({ status: 'success', message: 'Usuario actualizado correctamente' });
     });
@@ -230,6 +239,18 @@ router.post('/users/update/:id', (req, res) => {
 // Delete user by id //
 router.post('/users/delete/:id', (req, res) => {
     const { id } = req.params;
+
+    connection.query('SELECT * FROM user_accounts WHERE id = ?', [id], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'El usuario no existe' });
+            return;
+        } else if (result[0].role === 2) {
+            res.json({ status: 'error', message: 'No se puede eliminar un administrador' });
+            return;
+        }
+    });
+
 
     connection.query('DELETE FROM user_levels WHERE id = ?', [id], (err, _result) => {
         if (err) throw err;
@@ -248,8 +269,6 @@ router.post('/users/login', (req, res) => {
         res.json({ status: 'error', message: 'Faltan datos' });
         return;
     }
-
-    console.log(email, password);
 
     connection.query('SELECT id,name,lastname,email,`group`,subgroup,`role` FROM user_accounts WHERE email = ? AND password = ?', [email, password], (err, result) => {
         if (err) throw err;
@@ -389,8 +408,9 @@ router.get('/group/:type/:id', (req, res) => {
 router.post('/group/tutor/:id', (req, res) => {
     const { id } = req.params;
     let data: any = [];
+    let data2: any = [];
 
-    connection.query('SELECT id,NAME,lastname,email,`role` FROM user_accounts WHERE id = ?', [id], (err, result) => {
+    connection.query('SELECT id,NAME,lastname,email,`role`,`group`,`subgroup` FROM user_accounts WHERE id = ?', [id], (err, result) => {
         if (err) throw err;
         if (result.length === 0) {
             res.json({ status: 'error', message: 'No existe el usuario' });
@@ -403,16 +423,82 @@ router.post('/group/tutor/:id', (req, res) => {
                     res.json({ status: 'error', message: 'No es tutor' });
                     return;
                 } else {
-                    connection.query('SELECT id,label FROM groups_secundary WHERE id_primary = ?', [result[0].id], (err, result) => {
+                    data2 = result[0];
+                    connection.query('SELECT id,label FROM groups_secundary WHERE id_primary = ?', [data2.id], (err, result) => {
                         if (err) throw err;
                         if (result.length === 0) {
-                            res.json({ status: 'error', message: 'No es tutor' });
+                            res.json({ status: 'error', message: 'No tiene grupos' });
                             return;
                         } else {
                             res.json({ status: 'success', message: 'Tutor', data: data, group: result });
                         }
                     });
                 }
+            });
+        }
+    });
+});
+
+//====================================================//
+
+//====================== Foro ========================//
+
+router.post('/forum/send', (req, res) => {
+    const { username_id, message, id_subgroup } = req.body;
+
+    if (!username_id || !message || !id_subgroup) {
+        res.json({ status: 'error', message: 'Faltan datos' });
+        return;
+    }
+    
+    connection.query('SELECT id FROM user_accounts WHERE id = ?', [username_id], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'No existe el usuario' });
+            return;
+        } else {
+            connection.query('SELECT id FROM groups_secundary WHERE id = ?', [id_subgroup], (err, result) => {
+                if (err) throw err;
+                if (result.length === 0) {
+                    res.json({ status: 'error', message: 'No existe el grupo' });
+                    return;
+                } else {
+                    connection.query('INSERT INTO foro_messages (username_id, message, id_subgroup) VALUES (?,?,?)', [username_id, message, id_subgroup], (err, _result) => {
+                        if (err) throw err;
+                        res.json({ status: 'success', message: 'Mensaje enviado' });
+                    });
+                }
+            });
+        }
+     });
+});
+
+router.get('/forum/:id', (req, res) => {
+    const { id } = req.params;
+
+    connection.query('SELECT foro_messages.id,user_accounts.name,user_accounts.lastname,message,`time` FROM foro_messages INNER JOIN user_accounts ON foro_messages.username_id = user_accounts.id WHERE foro_messages.id_subgroup = ?', [id], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'No hay mensajes' });
+            return;
+        } else {
+            res.json({ status: 'success', message: 'Mensajes', data: result });
+        }
+    });
+});
+
+router.post('/forum/delete/:id', (req, res) => {
+    const { id } = req.params;
+
+    connection.query('SELECT id FROM foro_messages WHERE id = ?', [id], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'No existe el mensaje' });
+            return;
+        } else {
+            connection.query('DELETE FROM foro_messages WHERE id = ?', [id], (err, _result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Mensaje eliminado' });
             });
         }
     });
