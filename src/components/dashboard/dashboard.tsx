@@ -35,7 +35,6 @@ const Dashboard = () => {
 
     return (
         <div>
-            <Reade/>
             <img src="https://eurolab.com.es/wp-content/uploads/2019/02/UB-BARNA.png" alt="Logo" width="100" height="100"  className="logo"/>
             <h1>Dashboard</h1>
 

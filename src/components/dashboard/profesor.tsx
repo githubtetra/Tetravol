@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import axios from "axios";
 import api from "../../hooks/hooks"
 import '../css/styles.css'
+import * as XLSX from 'xlsx';
 
 interface User {
     id: number;
@@ -137,7 +138,7 @@ const Profesor = () => {
             password: "",
             group: group_profesor,
             subgroup: subgrou_profesor,
-            role: 0,
+            role: 4,
         });
         getUsers();
     };
@@ -216,7 +217,60 @@ const Profesor = () => {
         await api.addSecondaryGroup(group.label, group_profesor);
         getGroups();
     };
+    
+    // File
+    const [file, setFile] = useState<File | null>(null);
 
+    const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setFile(e.target.files[0]);
+        }
+    }
+
+    const handleRead = async (): Promise<void> => {
+
+        if (!file) {
+            alert("Please select a file");
+            return;
+        }
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (e.target) {
+                    const bstr = e.target.result;
+                    const wb = XLSX.read(bstr, {type: "binary"});
+                    const wsname = wb.SheetNames[0];
+                    const ws = wb.Sheets[wsname];
+                    const data = XLSX.utils.sheet_to_json(ws);
+                    console.log(data);
+
+                    for (let i = 0; i < data.length; i++) {
+                        const element:any = data[i];
+                        const student: User = {
+                            id: 0,
+                            name: element["Nombre"],
+                            lastname: element["Apellido"],
+                            email: element["Correo"],
+                            group: group_profesor,
+                            subgroup: subgrou_profesor,
+                            role: 4,
+                            password: "",
+                        }
+
+                        addUser(student);
+                    }
+
+                }
+            }
+
+            reader.readAsBinaryString(file);
+        }
+
+        // Reload page
+        window.location.reload();
+
+    }
 
     useEffect(() => {
         getUsers();
@@ -241,6 +295,15 @@ const Profesor = () => {
                     addUser(newuser)
                 }}>Add Profesor</button>
             </form>
+
+            <br></br>
+            <label>Subir archivo con alumnos: </label>
+            <input type={"file"} onChange={handleFile} accept=".xlsx" />
+            {/* <div>{file && `${file.name} - ${file.type}`}</div> */}
+            <button onClick={handleRead}>Upload</button>
+            {/* Descargar plantilla */}
+            
+            <button>Descargar plantilla</button>
 
             {/* See all users */}
             <h2>All Users</h2>
