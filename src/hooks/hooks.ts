@@ -118,4 +118,25 @@ const addSecondaryGroup:Function = async (label_g: string, primary_id: string) =
 //     return response.data;
 // }
 
-export default { test, login, getAllUsers, getAllGroups, getUserById, addUser, addPrimaryGroup, deleteUser, updateUser, getTutorSubgroups, addSecondaryGroup };
+
+// Quests
+const getAllQuests:Function = async () => {
+    const response = await axios.get(url+"quests/get/quests");
+    return response.data;
+}
+
+const getQuestsStatus:Function = async () => {
+    const response = await axios.get(url+"quests/get/groups");
+    return response.data;
+}
+
+const changeQuestStatus:Function = async (id_quest:number, id_group:number, status: number) => {
+    const response = await axios.post(url+"quests/update", {
+        id_quest: id_quest,
+        id_group: id_group,
+        status: status
+    });
+    return response.data;
+}
+
+export default { test, login, getAllUsers, getAllGroups, getUserById, addUser, addPrimaryGroup, deleteUser, updateUser, getTutorSubgroups, addSecondaryGroup, getAllQuests, getQuestsStatus, changeQuestStatus };

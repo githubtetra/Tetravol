@@ -22,6 +22,19 @@ interface Group {
     id_tutor: number | null; // null if it is a secondary group
 }
 
+interface Quest {
+    id: number;
+    label: string;
+}
+
+interface QuestGroup {
+    id: number;
+    label: string;
+    id_quest: number;
+    id_group: number;
+    status: boolean;
+}
+
 let group_profesor = -1;
 let subgrou_profesor = -1;
 
@@ -217,7 +230,108 @@ const Profesor = () => {
         await api.addSecondaryGroup(group.label, group_profesor);
         getGroups();
     };
-    
+
+
+    // Actividades
+    const [actividades, setActividades] = React.useState<Quest[]>([]);
+    const [currentQuests, setCurrentQuests] = React.useState<QuestGroup[]>([]);
+
+    const getAllQuests: Function = async (): Promise<void> => {
+        const res = await api.getAllQuests();
+
+        for (let index = 0; index < res.data.length; index++) {
+            const element = res.data[index];
+            console.log("aaaa" + element.label);
+            let a: Quest = {
+                id: element.id,
+                label: element.label,
+            }
+
+            actividades.push(a);
+        }
+        
+        await getCurrentQuests();
+    };
+
+    const getCurrentQuests: Function = async (): Promise<void> => {
+        if (actividades.length == 0) {
+            console.log("No activities found yet " + actividades.length);
+            // Sleep for 1 second and then try again
+            setTimeout(getCurrentQuests, 1000);
+            return;
+        }
+
+        const res = await api.getQuestsStatus();
+        let final: QuestGroup[] = [];
+
+        for (let i = 0; i < actividades.length; i++) {
+            let found = false;
+            let status = false;
+            console.log("IN" + actividades[i].label);
+
+            for (let j = 0; j < res.data.length; j++) {
+                if (actividades[i].id == res.data[j].id_quest && res.data[j].id_group == group_profesor) {
+                    found = true;
+                    status = res.data[j].status == 1 ? true : false;
+                    console.log("Shit is active or not? " + status + " " + res.data[j].status);
+                    break;
+                }
+            }
+
+            if (!found) {
+                console.log("Not found" + actividades[i].label);
+                final.push({
+                    id: 0,
+                    label: actividades[i].label,
+                    id_quest: actividades[i].id,
+                    id_group: group_profesor,
+                    status: false,
+                });
+            } else {
+                console.log("Found");
+                final.push({
+                    id: 0,
+                    label: actividades[i].label,
+                    id_quest: actividades[i].id,
+                    id_group: group_profesor,
+                    status: status,
+                });
+            }
+        }
+
+        // Loop through the final array and search for repeated elements and remove the one with status false
+        for (let i = 0; i < final.length; i++) {
+            for (let j = i + 1; j < final.length; j++) {
+                if (final[i].id_quest == final[j].id_quest) {
+                    console.log("Equal");
+                    // If the status is false, remove the element, otherwise remove the other one
+                    // If both are true, remove the second one
+                    if (final[i].status == false) {
+                        final.splice(i, 1);
+                    }
+                    else if (final[j].status == false) {
+                        final.splice(j, 1);
+                    }
+                    else {
+                        final.splice(j, 1);
+                    }
+                } else {
+                    console.log("Not equal");
+                }
+            }
+        }
+
+        setCurrentQuests(final);
+    };
+
+    const changeActivityState: Function = async (id_quest:number, id_group:number, status: boolean): Promise<void> => {
+        console.log("Change activity state" + id_quest + " " + id_group + " " + status + " " + (status === true ? 0 : 1));  
+        await api.changeQuestStatus(id_quest, id_group, status === true ? 0 : 1);
+        // window.location.reload();
+        await getCurrentQuests();
+    };
+
+
     // File
     const [file, setFile] = useState<File | null>(null);
 
@@ -239,14 +353,14 @@ const Profesor = () => {
             reader.onload = (e) => {
                 if (e.target) {
                     const bstr = e.target.result;
-                    const wb = XLSX.read(bstr, {type: "binary"});
+                    const wb = XLSX.read(bstr, { type: "binary" });
                     const wsname = wb.SheetNames[0];
                     const ws = wb.Sheets[wsname];
                     const data = XLSX.utils.sheet_to_json(ws);
                     console.log(data);
 
                     for (let i = 0; i < data.length; i++) {
-                        const element:any = data[i];
+                        const element: any = data[i];
                         const student: User = {
                             id: 0,
                             name: element["Nombre"],
@@ -274,13 +388,47 @@ const Profesor = () => {
 
     useEffect(() => {
         getUsers();
+        getGroups();
+        getAllQuests();
     }, []);
 
     return (
         <div>
             <h1>Profesor</h1>
 
-            {/* Add Tutor */}
+            {/* Manage Quests */}
+            <h2>Actividades</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        currentQuests.map((activity) => (
+                            <tr key={activity.id}>
+                                <td>{activity.id}</td>
+                                <td>{activity.label}</td>
+                                <td>{activity.status ? "Activo" : "Inactivo"}</td>
+                                <td>
+                                    <button type="button" onClick={() => {
+                                        console.log("aaaa")
+                                        console.log("activity" + activity.id_quest + " " + activity.id_group + " " + activity.status);
+                                        changeActivityState(activity.id_quest, activity.id_group, activity.status);
+                                    }}>{activity.status ? "Desactivar" : "Activar"}</button>
+                                </td>
+                            </tr>
+                        ))
+                    }
+                </tbody>
+            </table>
+
+
+            {/* Add Profesor */}
             <h2>Add Estudiante</h2>
             <form>
                 <label>Name</label>
@@ -302,7 +450,7 @@ const Profesor = () => {
             {/* <div>{file && `${file.name} - ${file.type}`}</div> */}
             <button onClick={handleRead}>Upload</button>
             {/* Descargar plantilla */}
-            
+
             <button>Descargar plantilla</button>
 
             {/* See all users */}

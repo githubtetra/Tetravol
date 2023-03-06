@@ -23,8 +23,10 @@ interface Group {
     id_tutor: number | null; // null if it is a secondary group
 }
 
+let foro = false;
+
 const Dashboard = () => {
-    const logout:Function = ():void => {
+    const logout: Function = (): void => {
         localStorage.removeItem('id');
         localStorage.removeItem('email');
         localStorage.removeItem('password');
@@ -33,20 +35,36 @@ const Dashboard = () => {
         window.location.reload();
     }
 
+    const abrirCerrarForo = (cheforo: boolean) => {
+        if (cheforo) {
+            foro = true;
+        } else {
+            foro = false;
+        }
+    }
+
+
     return (
         <div>
-            <img src="https://eurolab.com.es/wp-content/uploads/2019/02/UB-BARNA.png" alt="Logo" width="100" height="100"  className="logo"/>
-            <h1>Dashboard</h1>
+            <img src="https://eurolab.com.es/wp-content/uploads/2019/02/UB-BARNA.png" alt="Logo" width="100" height="100" className="logo" />
+            <h1></h1>
 
-            <button onClick={() => {logout()}}>Logout</button>
+            <button onClick={() => { logout() }}>Logout</button>
+            <br></br><br></br>
+            <button onClick={() => { abrirCerrarForo(true) }}>Cocheforos</button>
 
             {
-                localStorage.getItem('role') == "1" ? <Admin /> : 
-                localStorage.getItem('role') == "2" ? <Tutor /> :
+
+                localStorage.getItem('role') == "1" ? 
+                <Admin /> :
+                localStorage.getItem('role') == "2" ? 
+                <Tutor /> :
                 localStorage.getItem('role') == "3" ? <Profesor /> :
                 localStorage.getItem('role') == "4" ? <Estudiante /> :
                 <div>ERROR</div>
+
             }
+
         </div>
     );
 }
