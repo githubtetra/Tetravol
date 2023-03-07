@@ -273,7 +273,8 @@ router.post('/users/login', (req, res) => {
     connection.query('SELECT id,name,lastname,email,`group`,subgroup,`role` FROM user_accounts WHERE email = ? AND password = ?', [email, password], (err, result) => {
         if (err) throw err;
         if (result.length === 0) {
-            res.json({ status: 'error', message: 'Usuario o contraseña incorrectos' });
+            // res.json({ status: 'error', message: 'Usuario o contraseña incorrectos' });
+            res.status(401).json({ status: 'error', message: 'Usuario o contraseña incorrectos' });
             return;
         } else {
             let data = result[0];
@@ -504,6 +505,150 @@ router.post('/forum/delete/:id', (req, res) => {
     });
 });
 
+//====================================================//
+
+//====================== Quests ======================//
+
+router.post('/quests/create', (req, res) => {
+    const { id_group, label, active } = req.body;
+
+    if (!id_group || !label || !active) {
+        res.json({ status: 'error', message: 'Faltan datos' });
+        return;
+    }
+
+    connection.query('SELECT id FROM groups_primary WHERE id = ?', [id_group], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'No existe el grupo' });
+            return;
+        } else {
+            connection.query('INSERT INTO quest_activitis (id_group, label, status) VALUES (?,?,?)', [id_group, label, active], (err, _result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Misión creada' });
+            });
+        }
+    });
+});
+
+router.get('/quests/:id', (req, res) => {
+    const { id } = req.params;
+
+    connection.query('SELECT * FROM quest_activitis WHERE id = ?', [id], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'No hay misiones' });
+            return;
+        } else {
+            res.json({ status: 'success', message: 'Misiones', data: result[0] });
+        }
+    });
+});
+
+router.post('/quests/delete/:id', (req, res) => { 
+    const { id } = req.params;
+
+    connection.query('SELECT id FROM quest_activitis WHERE id = ?', [id], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'No existe la misión' });
+            return;
+        } else {
+            connection.query('DELETE FROM quest_activitis WHERE id = ?', [id], (err, _result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Misión eliminada' });
+            });
+        }
+    });
+});
+
+router.post('/quests/suscribe/group', (req, res) => {
+    const { id_group, id_quest } = req.body;
+
+    if (!id_group || !id_quest) {
+        res.json({ status: 'error', message: 'Faltan datos' });
+        return;
+    }
+
+    connection.query('SELECT id FROM groups_primary WHERE id = ?', [id_group], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'No existe el grupo' });
+            return;
+        } else {
+            connection.query('SELECT id FROM quest_activitis WHERE id = ?', [id_quest], (err, result) => {
+                if (err) throw err;
+                if (result.length === 0) {
+                    res.json({ status: 'error', message: 'No existe la misión' });
+                    return;
+                } else {
+                    connection.query('INSERT INTO quest_groups (id_group, id_quest) VALUES (?,?)', [id_group, id_quest], (err, _result) => {
+                        if (err) throw err;
+                        res.json({ status: 'success', message: 'Misión suscrita' });
+                    });
+                }
+            });
+        }
+    });
+});
+
+router.get('/quests/get/:type', (req, res) => {
+    const { type } = req.params;
+
+    switch (type) {
+        case 'quests':
+            connection.query('SELECT * FROM quest_activitis', (err, result) => {
+                if (err) throw err;
+                if (result.length === 0) {
+                    res.json({ status: 'error', message: 'No hay misiones' });
+                    return;
+                } else {
+                    res.json({ status: 'success', message: 'Misiones', data: result });
+                }
+            });
+            break;
+        case 'groups':
+            connection.query('SELECT * FROM quest_groups', (err, result) => {
+                if (err) throw err;
+                if (result.length === 0) {
+                    res.json({ status: 'error', message: 'No hay misiones' });
+                    return;
+                } else {
+                    res.json({ status: 'success', message: 'Misiones', data: result });
+                }
+            });
+            break;
+        default:
+    }
+});
+
+router.post('/quests/update', (req, res) => {
+    const { id_group, id_quest, status } = req.body;
+
+    console.log("id_group: " + id_group + " id_quest: " + id_quest + " status: " + status);
+
+    connection.query('SELECT id FROM quest_groups WHERE id_group = ? AND id_quest = ?', [id_group, id_quest], (err, result) => {
+        if (err) throw err;
+        // console.log("result: " + result);
+        if (result.length <= 0) {
+            // console.log("No existe la misión");
+            // creamos la misión para el grupo
+            connection.query('INSERT INTO quest_groups (id_group, id_quest, status) VALUES (?,?,?)', [id_group, id_quest, status], (err, _result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Misión creada' });
+                return;
+            });
+        } else if (result.length > 0) {
+            // console.log("Existe la misión");
+            // actualizamos la misión del grupo
+            connection.query('UPDATE quest_groups SET status = ? WHERE id = ?', [status, result[0].id], (err, _result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Misión actualizada' });
+                return;
+            });
+        }
+    });
+});
 //====================================================//
 
 export default router;
