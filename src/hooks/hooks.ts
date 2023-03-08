@@ -139,4 +139,25 @@ const changeQuestStatus:Function = async (id_quest:number, id_group:number, stat
     return response.data;
 }
 
-export default { test, login, getAllUsers, getAllGroups, getUserById, addUser, addPrimaryGroup, deleteUser, updateUser, getTutorSubgroups, addSecondaryGroup, getAllQuests, getQuestsStatus, changeQuestStatus };
+
+// Forum
+const uploadMessage:Function = async (user_id:number, message:string, subgroup:number) => {
+    const response = await axios.post(url+"forum/send", {
+        username_id: user_id,
+        message: message,
+        id_subgroup: subgroup
+    });
+    return response.data;
+}
+
+const getMessages:Function = async (subgroup:number) => {
+    const response = await axios.get(url+"forum/" + subgroup.toString());
+    return response.data;
+}
+
+const deleteMessages:Function = async (id:number) => {
+    const response = await axios.post(url+"forum/delete/" + id);
+    return response.data;
+}
+
+export default { test, login, getAllUsers, getAllGroups, getUserById, addUser, addPrimaryGroup, deleteUser, updateUser, getTutorSubgroups, addSecondaryGroup, getAllQuests, getQuestsStatus, changeQuestStatus, uploadMessage, getMessages, deleteMessages };

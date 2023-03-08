@@ -1,0 +1,66 @@
+.foro {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    margin : 0 auto;
+}
+
+.foro__input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+.foro__input input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+}
+
+.foro__input button {
+    margin: auto;
+    margin-top: 10px;
+    background-color: #ccc;
+    border: none;
+    outline: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    
+    display: flex;
+    right: 0;
+    bottom: 0;
+}
+
+.foro__messages {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.foro__message {
+    padding: 10px;
+    ;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.foro__message__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.foro__message__delete {
+    background-color: #ccc;
+    border: none;
+    outline: none;
+    padding: 4px;
+    cursor: pointer;
+}

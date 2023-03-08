@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Reade from "../comp/read_excel";
 import Admin from "./admin";
 import Estudiante from "./estudiantes";
 import Tutor from "./tutor";
 import Profesor from "./profesor";
+import Foro from "./foro";
 
 interface User {
     id: number;
@@ -24,6 +25,7 @@ interface Group {
 }
 
 let foro = false;
+let url = window.location.href;
 
 const Dashboard = () => {
     const logout: Function = (): void => {
@@ -35,14 +37,9 @@ const Dashboard = () => {
         window.location.reload();
     }
 
-    const abrirCerrarForo = (cheforo: boolean) => {
-        if (cheforo) {
-            foro = true;
-        } else {
-            foro = false;
-        }
-    }
-
+    useState(() => {
+        url = window.location.href;
+    });
 
     return (
         <div>
@@ -51,18 +48,25 @@ const Dashboard = () => {
 
             <button onClick={() => { logout() }}>Logout</button>
             <br></br><br></br>
-            <button onClick={() => { abrirCerrarForo(true) }}>Cocheforos</button>
 
-            {
 
-                localStorage.getItem('role') == "1" ? 
-                <Admin /> :
-                localStorage.getItem('role') == "2" ? 
-                <Tutor /> :
-                localStorage.getItem('role') == "3" ? <Profesor /> :
-                localStorage.getItem('role') == "4" ? <Estudiante /> :
-                <div>ERROR</div>
+            {url.endsWith("/cocheforos") ? <Foro /> :
 
+                <>
+                    <button onClick={() => {
+                        window.open(url + "/cocheforos", "_blank");
+                    }}>Cocheforos</button>
+
+                    {
+                        localStorage.getItem('role') == "1" ?
+                        <Admin /> :
+                        localStorage.getItem('role') == "2" ?
+                        <Tutor /> :
+                        localStorage.getItem('role') == "3" ? <Profesor /> :
+                        localStorage.getItem('role') == "4" ? <Estudiante /> :
+                        <div>ERROR</div>
+                    }
+                </>
             }
 
         </div>

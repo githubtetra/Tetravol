@@ -95,6 +95,7 @@ const Profesor = () => {
                     console.log("Tutor group: " + all_users[i].group);
                     tutor_group = all_users[i].group;
                     group_profesor = tutor_group;
+                    localStorage.setItem("sub_group", tutor_group.toString());
                     break;
                 }
             }
@@ -305,14 +306,14 @@ const Profesor = () => {
                 if (final[i].id_quest == final[j].id_quest) {
                     console.log("Equal");
                     // If the status is false, remove the element, otherwise remove the other one
-                    // If both are true, remove the second one
-                    if (final[i].status == false) {
-                        final.splice(i, 1);
-                    }
-                    else if (final[j].status == false) {
+                    // If both are the same status, remove the second one
+                    if (final[i].status == false && final[j].status == false) {
                         final.splice(j, 1);
-                    }
-                    else {
+                    } else if (final[i].status == true && final[j].status == false) {
+                        final.splice(j, 1);
+                    } else if (final[i].status == false && final[j].status == true) {
+                        final.splice(i, 1);
+                    } else {
                         final.splice(j, 1);
                     }
                 } else {
@@ -320,7 +321,6 @@ const Profesor = () => {
                 }
             }
         }
-
         setCurrentQuests(final);
     };
 

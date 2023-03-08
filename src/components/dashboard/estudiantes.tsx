@@ -5,16 +5,19 @@ import '../css/estudiantes.css'
 import api from '../../hooks/hooks';
 import { Link, Route } from "react-router-dom";
 import A1 from "../actividades/1";
+import A2 from "../actividades/2";
 
 
 interface Quest {
     id: number;
     label: string;
+    description: string;
 }
 
 interface QuestGroup {
     id: number;
     label: string;
+    description: string;
     id_quest: number;
     id_group: number;
     status: boolean;
@@ -23,6 +26,9 @@ interface QuestGroup {
 let group_profesor = -1;
 
 const Estudiante = () => {
+    const [amongus_rap, setAmongusRap] = React.useState<boolean>(false);
+    const [activity, setActivity] = React.useState<number>(0);
+
     const getUsers: Function = async (): Promise<void> => {
         const res = await api.getAllUsers();
         let all_users = res.data;
@@ -38,6 +44,7 @@ const Estudiante = () => {
                     console.log("Tutor group: " + all_users[i].group);
                     tutor_group = all_users[i].group;
                     group_profesor = tutor_group;
+                    localStorage.setItem("sub_group", tutor_group.toString());
                     break;
                 }
             }
@@ -56,11 +63,12 @@ const Estudiante = () => {
             let a: Quest = {
                 id: element.id,
                 label: element.label,
+                description: element.description
             }
 
             actividades.push(a);
         }
-        
+
         await getCurrentQuests();
     };
 
@@ -94,6 +102,7 @@ const Estudiante = () => {
                 final.push({
                     id: 0,
                     label: actividades[i].label,
+                    description: actividades[i].description,
                     id_quest: actividades[i].id,
                     id_group: group_profesor,
                     status: false,
@@ -103,6 +112,7 @@ const Estudiante = () => {
                 final.push({
                     id: 0,
                     label: actividades[i].label,
+                    description: actividades[i].description,
                     id_quest: actividades[i].id,
                     id_group: group_profesor,
                     status: status,
@@ -116,14 +126,14 @@ const Estudiante = () => {
                 if (final[i].id_quest == final[j].id_quest) {
                     console.log("Equal");
                     // If the status is false, remove the element, otherwise remove the other one
-                    // If both are true, remove the second one
-                    if (final[i].status == false) {
-                        final.splice(i, 1);
-                    }
-                    else if (final[j].status == false) {
+                    // If both are the same status, remove the second one
+                    if (final[i].status == false && final[j].status == false) {
                         final.splice(j, 1);
-                    }
-                    else {
+                    } else if (final[i].status == true && final[j].status == false) {
+                        final.splice(j, 1);
+                    } else if (final[i].status == false && final[j].status == true) {
+                        final.splice(i, 1);
+                    } else {
                         final.splice(j, 1);
                     }
                 } else {
@@ -165,36 +175,51 @@ const Estudiante = () => {
                     }
                 }/> */}
 
-            <div className="actividades">
-            <h1>Actividades</h1>
-                {
-                    currentQuests.map((quest) => {
-                        return (
-                            <div className="actividad">
-                                <h2>{quest.label}</h2>
-                                <p>Descripción de la actividad {quest.label}</p>
-                                <button onClick={
-                                    () => {
-                                        console.log("Clicked");
-                                        
-                                    }
-                                }>Entrar</button>
-                            </div>
-                        )
-                    })
-                }
+            {
+                amongus_rap ? <>
+                    {
+                        activity == 1 ? <A1 /> :
+                            activity == 2 ? <A2/> :
+                            // activity == 3 ? <A3/> :
+                            // activity == 4 ? <A4/> :
+                            // activity == 5 ? <A5/> :
+                            // activity == 6 ? <A6/> :
+                            <div>upsi xd</div>
+                    }
+                    <button onClick={
+                        () => {
+                            console.log("Clicked");
+                            setAmongusRap(false);
+                        }
+                    }>Salir</button>
+                </>
+                    :
+                    <>
+                        <div className="actividades">
+                            <h1>Actividades</h1>
+                            {
+                                currentQuests.map((quest) => {
+                                    return (
+                                        quest.status ?
+                                            <div className="actividad">
+                                                <h2>{quest.label}</h2>
+                                                <p>{quest.description}</p>
+                                                <button onClick={
+                                                    () => {
+                                                        console.log("Clicked");
+                                                        setAmongusRap(true);
+                                                        setActivity(quest.id_quest);
+                                                    }
+                                                }>Entrar</button>
+                                            </div>
+                                            : <div></div>
+                                    )
+                                })
+                            }
+                        </div>
+                    </>
+            }
 
-                {/* <div className="actividad">
-                    <h2>Actividad 1</h2>
-                    <p>Descripción de la actividad 1</p>
-                    <button>Terminada</button>
-                </div>
-                <div className="actividad">
-                    <h2>Actividad 2</h2>
-                    <p>Descripción de la actividad 2</p>
-                    <button>No terminada</button>
-                </div> */}
-            </div>
 
         </div>
     );
