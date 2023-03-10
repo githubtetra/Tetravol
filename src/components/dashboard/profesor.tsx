@@ -35,8 +35,17 @@ interface QuestGroup {
     status: boolean;
 }
 
+interface Activity {
+    id: number;
+    id_activity: number;
+    status: boolean;
+    title: string;
+    description: string;
+    id_quest: number;
+}
+
 let group_profesor = -1;
-let subgrou_profesor = -1;
+let subgroup_profesor = -1;
 
 const Profesor = () => {
 
@@ -102,7 +111,7 @@ const Profesor = () => {
         }
 
         let re = await api.getUserById(tutor_id);
-        subgrou_profesor = re.data.subgroup;
+        subgroup_profesor = re.data.subgroup;
 
         if (group_profesor == -1) {
             console.log("Error: Tutor group not found:" + group_profesor);
@@ -123,15 +132,15 @@ const Profesor = () => {
             alert("Error: Tutor group not found");
             getUsers();
             return;
-        } else if (subgrou_profesor == -1) {
-            console.log("Error: Tutor subgroup not found:" + subgrou_profesor);
+        } else if (subgroup_profesor == -1) {
+            console.log("Error: Tutor subgroup not found:" + subgroup_profesor);
             alert("Error: Tutor subgroup not found");
             getUsers();
             return;
         }
         user.group = group_profesor;
         user.role = 4;
-        user.subgroup = subgrou_profesor;
+        user.subgroup = subgroup_profesor;
 
         if (user.name === "" || user.lastname === "" || user.email === "") {
             alert("Please fill all the fields");
@@ -151,7 +160,7 @@ const Profesor = () => {
             email: "",
             password: "",
             group: group_profesor,
-            subgroup: subgrou_profesor,
+            subgroup: subgroup_profesor,
             role: 4,
         });
         getUsers();
@@ -234,8 +243,8 @@ const Profesor = () => {
 
 
     // Actividades
-    const [actividades, setActividades] = React.useState<Quest[]>([]);
-    const [currentQuests, setCurrentQuests] = React.useState<QuestGroup[]>([]);
+    const [actividades, setActividades] = useState<Quest[]>([]);
+    const [currentQuests, setCurrentQuests] = useState<QuestGroup[]>([]);
 
     const getAllQuests: Function = async (): Promise<void> => {
         const res = await api.getAllQuests();
@@ -250,7 +259,7 @@ const Profesor = () => {
 
             actividades.push(a);
         }
-        
+
         await getCurrentQuests();
     };
 
@@ -322,14 +331,99 @@ const Profesor = () => {
             }
         }
         setCurrentQuests(final);
+        getAllActivites(final);
     };
 
-    const changeActivityState: Function = async (id_quest:number, id_group:number, status: boolean): Promise<void> => {
-        console.log("Change activity state" + id_quest + " " + id_group + " " + status + " " + (status === true ? 0 : 1));  
+    const changeActivityState: Function = async (id_quest: number, id_group: number, status: boolean): Promise<void> => {
+        console.log("Change activity state" + id_quest + " " + id_group + " " + status + " " + (status === true ? 0 : 1));
         await api.changeQuestStatus(id_quest, id_group, status === true ? 0 : 1);
         // window.location.reload();
         await getCurrentQuests();
     };
+
+
+
+    const [allActivites, setAllActivites] = useState<Activity[]>([]);
+
+    const getAllActivites: Function = async (q: QuestGroup[]): Promise<void> => {
+        if (currentQuests.length == 0 && q.length == 0) {
+            console.log("No activities found yet " + q.length);
+            // Sleep for 1 second and then try again
+            setTimeout(getAllActivites, 1000);
+            return;
+        }
+
+        const act: Activity[] = [];
+
+        // if (currentQuests.length > 0) {
+        //     currentQuests.forEach(async element => {
+        //         if (element.id != null && element.id_group == group_profesor) {
+        //             console.log("Getting activities for A " + element.label);
+        //             const rest = await api.getGroupActivities(group_profesor, element.id);
+                    
+        //             console.log("REST")
+        //             console.log(rest)
+
+        //             let idq: number = element.id_quest;
+
+        //             for (let index = 0; index < rest.data.length; index++) {
+        //                 console.log("IDDDDDDD" + rest.data[rest.data[index].id].id);
+        //                 const element = rest.data[index];
+        //                 let a: Activity = {
+        //                     id: rest.data[index].id,
+        //                     id_quest: idq,
+        //                     title: rest.data[index].title,
+        //                     description: rest.data[index].description,
+        //                     status: rest.data[index].status == 1 ? true : false,
+        //                 }
+
+        //                 act.push(a);
+        //             }
+        //         }
+        //     });
+        // } 
+        if (q.length > 0) {
+            q.forEach(async element => {
+                if (element.id != null && element.id_group == group_profesor) {
+                    console.log("Getting activities for B " + element.label);
+                    const rest = await api.getGroupActivities(group_profesor, element.id_quest);
+
+                    console.log("REST B + " + rest.data.length)
+
+                    let idq: number = element.id_quest;
+
+                    for (let index = 0; index < rest.data.length; index++) {
+                        console.log("REST B + For " + rest.data.length)
+                        console.log(rest.data)
+                        console.log("IDDDDDDD" + rest.data[index].id);
+                        const element = rest.data[index];
+                        let a: Activity = {
+                            id: rest.data[index].id,
+                            id_quest: idq,
+                            id_activity: rest.data[index].id_actividad,
+                            title: rest.data[index].title,
+                            description: rest.data[index].description,
+                            status: rest.data[index].status == 1 ? true : false,
+                        }
+
+                        console.log("Activity + " + idq + " " + rest.data.length);
+                        console.log(act);
+
+                        act.push(a);
+                    }
+                }
+            });
+        }
+
+        setAllActivites(act);
+    }
+
+    const chngActivityState: Function = async (id: number, id_quest: number, status: boolean): Promise<void> => {
+        await api.changeGroupActivityState(subgroup_profesor, id_quest, status === true ? 0 : 1);
+
+        window.location.reload();
+    }
+
 
 
     // File
@@ -367,7 +461,7 @@ const Profesor = () => {
                             lastname: element["Apellido"],
                             email: element["Correo"],
                             group: group_profesor,
-                            subgroup: subgrou_profesor,
+                            subgroup: subgroup_profesor,
                             role: 4,
                             password: "",
                         }
@@ -383,7 +477,6 @@ const Profesor = () => {
 
         // Reload page
         window.location.reload();
-
     }
 
     useEffect(() => {
@@ -428,6 +521,56 @@ const Profesor = () => {
             </table>
 
 
+
+            {/* Manage Activities */}
+            <h2>Actividades</h2>
+            <button onClick={
+                () => {
+                    setAllActivites([...allActivites]);
+                    console.log(allActivites);
+                }
+            }>Cargar</button>
+            {
+                currentQuests.map((quest) => (
+                    <div>
+                        <h3>{quest.label}</h3>
+                        <table key={quest.id}>
+                            <thead>
+                                <tr>
+                                    <th>{quest.label}</th>
+                                    <th>Estado: {quest.status ? "Activo" : "Inactivo"}</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    // Wait for allActivites to have data
+                                    allActivites.map((ac) => (
+                                        ac.id_quest == quest.id_quest ?
+                                            <>
+                                                {
+                                                    <tr key={ac.id}>
+                                                        <td>{ac.title}</td>
+                                                        <td>{ac.status ? "Activo" : "Inactivo"}</td>
+                                                        <td>
+                                                            <button type="button" onClick={() => {
+                                                                chngActivityState(ac.id, ac.id_activity, ac.status);
+                                                            }}>{ac.status ? "Desactivar" : "Activar"}</button>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </>
+                                            :
+                                            <></>
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                ))
+            }
+
+
             {/* Add Profesor */}
             <h2>Add Estudiante</h2>
             <form>
@@ -451,7 +594,7 @@ const Profesor = () => {
             <button onClick={handleRead}>Upload</button>
             {/* Descargar plantilla */}
 
-            <button>Descargar plantilla</button>
+            <button disabled>Descargar plantilla</button>
 
             {/* See all users */}
             <h2>All Users</h2>

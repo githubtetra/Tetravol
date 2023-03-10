@@ -160,4 +160,20 @@ const deleteMessages:Function = async (id:number) => {
     return response.data;
 }
 
-export default { test, login, getAllUsers, getAllGroups, getUserById, addUser, addPrimaryGroup, deleteUser, updateUser, getTutorSubgroups, addSecondaryGroup, getAllQuests, getQuestsStatus, changeQuestStatus, uploadMessage, getMessages, deleteMessages };
+// Activities
+const getGroupActivities:Function = async (group_id: number, id_quest: number) => {
+    const response = await axios.get(url+"quests/get/activity/" + group_id.toString() + "/" + id_quest.toString());
+    return response.data;
+}
+
+const changeGroupActivityState: Function = async (group_id: number, id_quest: number, state: number) => {
+    const response = await axios.post(url+"quests/update/activity", {
+        id_subgroup: group_id,
+        id_quest: id_quest,
+        status: state
+    });
+
+    return response.data;
+}
+
+export default { test, login, getAllUsers, getAllGroups, getUserById, addUser, addPrimaryGroup, deleteUser, updateUser, getTutorSubgroups, addSecondaryGroup, getAllQuests, getQuestsStatus, changeQuestStatus, uploadMessage, getMessages, deleteMessages, getGroupActivities, changeGroupActivityState };

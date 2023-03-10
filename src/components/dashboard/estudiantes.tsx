@@ -37,17 +37,10 @@ const Estudiante = () => {
 
         // Find the tutor's group
         if (group_profesor == -1) {
-            let tutor_group = -1;
-            for (let i = 0; i < all_users.length; i++) {
-                console.log(all_users[i].id + " " + tutor_id);
-                if (all_users[i].id == tutor_id) {
-                    console.log("Tutor group: " + all_users[i].group);
-                    tutor_group = all_users[i].group;
-                    group_profesor = tutor_group;
-                    localStorage.setItem("sub_group", tutor_group.toString());
-                    break;
-                }
-            }
+            let dat = await api.getUserById(localStorage.getItem("id"));
+            console.log(dat.data);
+            group_profesor = dat.data.subgroup;
+            localStorage.setItem("sub_group", group_profesor.toString());
         }
     };
     // Actividades
@@ -179,12 +172,12 @@ const Estudiante = () => {
                 amongus_rap ? <>
                     {
                         activity == 1 ? <A1 /> :
-                            activity == 2 ? <A2/> :
-                            // activity == 3 ? <A3/> :
-                            // activity == 4 ? <A4/> :
-                            // activity == 5 ? <A5/> :
-                            // activity == 6 ? <A6/> :
-                            <div>upsi xd</div>
+                        activity == 2 ? <A2/> :
+                        // activity == 3 ? <A3/> :
+                        // activity == 4 ? <A4/> :
+                        // activity == 5 ? <A5/> :
+                        // activity == 6 ? <A6/> :
+                        <div></div>
                     }
                     <button onClick={
                         () => {
