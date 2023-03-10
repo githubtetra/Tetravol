@@ -3,7 +3,7 @@ import axios from "axios";
 const db_ip = "138.68.98.150:3001"
 const ip_local = "192.100.20.167:3000"
 const web_api = "ccitubapi.gamecademy.com:3000"
-const url = "http://"+ip_local+"/";
+const url = "http://"+web_api+"/";
 
 interface User {
     id: number;
