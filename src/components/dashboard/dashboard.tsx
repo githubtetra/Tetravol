@@ -46,14 +46,14 @@ const Dashboard = () => {
             <img src="https://eurolab.com.es/wp-content/uploads/2019/02/UB-BARNA.png" alt="Logo" width="100" height="100" className="logo" />
             <h1></h1>
 
-            <button onClick={() => { logout() }}>Logout</button>
+            <button className="log__out" onClick={() => { logout() }}>Logout</button>
             <br></br><br></br>
 
 
             {url.endsWith("/cocheforos") ? <Foro /> :
 
                 <>
-                    <button onClick={() => {
+                    <button className="foro__btn" onClick={() => {
                         window.open(url + "/cocheforos", "_blank");
                     }}>Cocheforos</button>
 

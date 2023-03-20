@@ -170,6 +170,12 @@ const Estudiante = () => {
 
             {
                 amongus_rap ? <>
+                                    <button onClick={
+                        () => {
+                            console.log("Clicked");
+                            setAmongusRap(false);
+                        }
+                    }>Ir atras</button>
                     {
                         activity == 1 ? <A1 /> :
                         activity == 2 ? <A2/> :
@@ -179,12 +185,7 @@ const Estudiante = () => {
                         // activity == 6 ? <A6/> :
                         <div></div>
                     }
-                    <button onClick={
-                        () => {
-                            console.log("Clicked");
-                            setAmongusRap(false);
-                        }
-                    }>Salir</button>
+
                 </>
                     :
                     <>

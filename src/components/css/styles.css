@@ -40,6 +40,12 @@ body {
     margin: 5px 0;
 }
 
+.bg-frame {
+    margin: auto;
+    height: 30em;
+    width: 50em;
+}
+
 /* General */
 table {
     width: 100%;
@@ -146,4 +152,24 @@ td {
 
 .editblock label {
     padding-right: 0.2em;
+}
+
+.log__out {
+    /* Place it on the top right */
+    position: absolute;
+    top: 0;
+    right: 0;
+    /* Add some padding */
+    padding: 0.5em;
+    margin: 0.5em;
+}
+
+.foro__btn {
+    /* Place it on the top right */
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Add some padding */
+    padding: 0.5em;
+    margin: 0.5em;
 }
