@@ -50,11 +50,11 @@ const Dashboard = () => {
             <br></br><br></br>
 
 
-            {url.endsWith("/cocheforos") ? <Foro /> :
+            {url.endsWith("/forum") ? <Foro /> :
 
                 <>
                     <button className="foro__btn" onClick={() => {
-                        window.open(url + "/cocheforos", "_blank");
+                        window.open(url + "/forum", "_blank");
                     }}>Cocheforos</button>
 
                     {
