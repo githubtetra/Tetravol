@@ -22,7 +22,7 @@ server.listen(PORT, () => {
 (async function () {
     const url = await ngrok.connect({
         addr: PORT,
-        authtoken: "2NH23uGCm1SLgcV99MHYWzMgxwD_6TjhcteG2Tb9FMuL3gWNV",
+        authtoken: "2NH92SrfVQuq7ObOfUFobeg248r_4qBnWbqNrCVegxgZ8GAT4",
         
     });
     console.log(`[ngrok]: Server is running at ${url}`);
