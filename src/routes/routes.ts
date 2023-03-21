@@ -93,26 +93,6 @@ router.post('/groups/update/:type/:id', (req, res) => {
     }
 });
 
-// Delete group by id (primary or secondary) //
-// router.post('/groups/delete/:type/:id', (req, res) => {
-//     const { type, id } = req.params;
-
-//     switch (type) {
-//         case 'primary':
-//             connection.query('DELETE FROM groups_primary WHERE id = ?', [id], (err, _result) => {
-//                 if (err) throw err;
-//                 res.json({ status: 'success', message: 'Grupo eliminado correctamente' });
-//             });
-//             break;
-//         case 'secondary':
-//             connection.query('DELETE FROM groups_secundary WHERE id = ?', [id], (err, _result) => {
-//                 if (err) throw err;
-//                 res.json({ status: 'success', message: 'Grupo eliminado correctamente' });
-//             });
-//             break;
-//     }
-// });
-
 // Get group by id (primary or secondary) //
 router.get('/groups/:type/:id', (req, res) => {
     const { type, id } = req.params;
@@ -451,7 +431,7 @@ router.post('/forum/send', (req, res) => {
         res.json({ status: 'error', message: 'Faltan datos' });
         return;
     }
-    
+
     connection.query('SELECT id FROM user_accounts WHERE id = ?', [username_id], (err, result) => {
         if (err) throw err;
         if (result.length === 0) {
@@ -464,20 +444,45 @@ router.post('/forum/send', (req, res) => {
                     res.json({ status: 'error', message: 'No existe el grupo' });
                     return;
                 } else {
-                    connection.query('INSERT INTO foro_messages (username_id, message, id_subgroup) VALUES (?,?,?)', [username_id, message, id_subgroup], (err, _result) => {
+                    // ✅ Defining a reusable function
+                    function padTo2Digits(num: number) {
+                        return num.toString().padStart(2, '0');
+                    }
+
+                    // 👇️ format as "YYYY-MM-DD hh:mm:ss"
+                    // You can tweak the format easily
+                    function formatDate(date: Date) {
+                        return (
+                            [
+                                date.getFullYear(),
+                                padTo2Digits(date.getMonth() + 1),
+                                padTo2Digits(date.getDate()),
+                            ].join('-') +
+                            ' ' +
+                            [
+                                padTo2Digits(date.getHours()),
+                                padTo2Digits(date.getMinutes()),
+                                padTo2Digits(date.getSeconds()),
+                            ].join(':')
+                        );
+                    }
+
+                    const date = formatDate(new Date());
+
+                    connection.query('INSERT INTO foro_messages (username_id, message, id_subgroup, `time`) VALUES (?,?,?,?)', [username_id, message, id_subgroup, date], (err, _result) => {
                         if (err) throw err;
                         res.json({ status: 'success', message: 'Mensaje enviado' });
                     });
                 }
             });
         }
-     });
+    });
 });
 
 router.get('/forum/:id', (req, res) => {
     const { id } = req.params;
 
-    connection.query('SELECT foro_messages.id,user_accounts.name,user_accounts.lastname,message,`time` FROM foro_messages INNER JOIN user_accounts ON foro_messages.username_id = user_accounts.id WHERE foro_messages.id_subgroup = ?', [id], (err, result) => {
+    connection.query('SELECT foro_messages.id,user_accounts.id AS id_user, user_accounts.name,user_accounts.lastname,message,`time` FROM foro_messages INNER JOIN user_accounts ON foro_messages.username_id = user_accounts.id WHERE foro_messages.id_subgroup = ? LIMIT 100', [id], (err, result) => {
         if (err) throw err;
         if (result.length === 0) {
             res.json({ status: 'error', message: 'No hay mensajes' });
@@ -523,7 +528,7 @@ router.post('/quests/create', (req, res) => {
             res.json({ status: 'error', message: 'No existe el grupo' });
             return;
         } else {
-            connection.query('INSERT INTO quest_activitis (id_group, label, status) VALUES (?,?,?)', [id_group, label, active], (err, _result) => {
+            connection.query('INSERT INTO quest (id_group, label, status) VALUES (?,?,?)', [id_group, label, active], (err, _result) => {
                 if (err) throw err;
                 res.json({ status: 'success', message: 'Misión creada' });
             });
@@ -534,7 +539,7 @@ router.post('/quests/create', (req, res) => {
 router.get('/quests/:id', (req, res) => {
     const { id } = req.params;
 
-    connection.query('SELECT * FROM quest_activitis WHERE id = ?', [id], (err, result) => {
+    connection.query('SELECT * FROM quest WHERE id = ?', [id], (err, result) => {
         if (err) throw err;
         if (result.length === 0) {
             res.json({ status: 'error', message: 'No hay misiones' });
@@ -545,16 +550,16 @@ router.get('/quests/:id', (req, res) => {
     });
 });
 
-router.post('/quests/delete/:id', (req, res) => { 
+router.post('/quests/delete/:id', (req, res) => {
     const { id } = req.params;
 
-    connection.query('SELECT id FROM quest_activitis WHERE id = ?', [id], (err, result) => {
+    connection.query('SELECT id FROM quest WHERE id = ?', [id], (err, result) => {
         if (err) throw err;
         if (result.length === 0) {
             res.json({ status: 'error', message: 'No existe la misión' });
             return;
         } else {
-            connection.query('DELETE FROM quest_activitis WHERE id = ?', [id], (err, _result) => {
+            connection.query('DELETE FROM quest WHERE id = ?', [id], (err, _result) => {
                 if (err) throw err;
                 res.json({ status: 'success', message: 'Misión eliminada' });
             });
@@ -576,7 +581,7 @@ router.post('/quests/suscribe/group', (req, res) => {
             res.json({ status: 'error', message: 'No existe el grupo' });
             return;
         } else {
-            connection.query('SELECT id FROM quest_activitis WHERE id = ?', [id_quest], (err, result) => {
+            connection.query('SELECT id FROM quest WHERE id = ?', [id_quest], (err, result) => {
                 if (err) throw err;
                 if (result.length === 0) {
                     res.json({ status: 'error', message: 'No existe la misión' });
@@ -597,7 +602,7 @@ router.get('/quests/get/:type', (req, res) => {
 
     switch (type) {
         case 'quests':
-            connection.query('SELECT * FROM quest_activitis', (err, result) => {
+            connection.query('SELECT * FROM quest', (err, result) => {
                 if (err) throw err;
                 if (result.length === 0) {
                     res.json({ status: 'error', message: 'No hay misiones' });
@@ -629,18 +634,13 @@ router.post('/quests/update', (req, res) => {
 
     connection.query('SELECT id FROM quest_groups WHERE id_group = ? AND id_quest = ?', [id_group, id_quest], (err, result) => {
         if (err) throw err;
-        // console.log("result: " + result);
         if (result.length <= 0) {
-            // console.log("No existe la misión");
-            // creamos la misión para el grupo
             connection.query('INSERT INTO quest_groups (id_group, id_quest, status) VALUES (?,?,?)', [id_group, id_quest, status], (err, _result) => {
                 if (err) throw err;
                 res.json({ status: 'success', message: 'Misión creada' });
                 return;
             });
         } else if (result.length > 0) {
-            // console.log("Existe la misión");
-            // actualizamos la misión del grupo
             connection.query('UPDATE quest_groups SET status = ? WHERE id = ?', [status, result[0].id], (err, _result) => {
                 if (err) throw err;
                 res.json({ status: 'success', message: 'Misión actualizada' });
@@ -649,6 +649,48 @@ router.post('/quests/update', (req, res) => {
         }
     });
 });
+
+router.get('/quests/get/activity/:id_subgroup/:id_quest', (req, res) => {
+    const { id_subgroup, id_quest } = req.params;
+
+    connection.query('SELECT * FROM groups_secundary WHERE id = ?', [id_subgroup], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            res.json({ status: 'error', message: 'No hay actividades' });
+            return;
+        }
+        connection.query('SELECT quest_activity_status.id,quest_activity_status.`status`,quest_activity.title,quest_activity.description,quest_activity.id AS id_actividad FROM quest_activity_status INNER JOIN quest_activity ON quest_activity_status.id_quest = quest_activity.id WHERE quest_activity_status.id_subgroup = ? AND quest_activity_status.`id activity` = ?', [id_subgroup, id_quest], (err, result) => {
+            if (err) throw err;
+            if (result.length === 0) {
+                res.json({ status: 'error', message: 'No hay actividades' });
+                return;
+            } else {
+                res.json({ status: 'success', message: 'Actividades', data: result });
+            }
+        });
+    });
+});
+
+router.post('/quests/update/activity', (req, res) => {
+    const { id_subgroup, id_quest, status } = req.body;
+
+    console.log("=================================== id_subgroup: " + id_subgroup + " id_quest: " + id_quest + " status: " + status);
+    
+    connection.query('SELECT id FROM quest_activity_status WHERE id_subgroup = ? AND id_quest = ?', [id_subgroup, id_quest], (err, result) => {
+        if (err) throw err;
+        if (result.length > 0) {
+            connection.query('UPDATE quest_activity_status SET status = ? WHERE id = ?', [status, result[0].id], (err, _result) => {
+                if (err) throw err;
+                res.json({ status: 'success', message: 'Actividad actualizada' });
+                return;
+            });
+        } else if (result.length <= 0) {
+            res.json({ status: 'error', message: 'No existe la actividad' });
+            return;
+        }
+    });
+});
+
 //====================================================//
 
 export default router;
