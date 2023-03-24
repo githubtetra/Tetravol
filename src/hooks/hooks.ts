@@ -3,7 +3,7 @@ import axios from "axios";
 const db_ip = "138.68.98.150:3001"
 const ip_local = "192.100.20.167:3000"
 const web_api = "ccitubapi.gamecademy.com:3000"
-const url = "https://953c-91-126-37-132.ngrok.io/";
+const url = "https://b7e0-91-126-37-132.ngrok.io/";
 
 interface User {
     id: number;
